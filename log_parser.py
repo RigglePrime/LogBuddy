@@ -1,3 +1,4 @@
+from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
 from math import sqrt, pow
@@ -32,7 +33,7 @@ class LogFile:
     who: list[str] = []
     sortable: bool = True
 
-    def __init__(self, type: LogFileType = LogFileType.UNKNOWN, logs: list[str] = []) -> None:
+    def __init__(self, type: LogFileType = LogFileType.UNKNOWN, logs: list[str] = [], verbose: bool = False) -> None:
         self.log_type = type
         for line in logs:
             try:
@@ -42,7 +43,7 @@ class LogFile:
                 if log.agent and log.agent.ckey and log.agent.ckey not in self.who: self.who.append(log.agent.ckey)
             except Exception as e:
                 print(f"Could not be parsed: '{line}', with the reason:", e)
-                traceback.print_exc()
+                if verbose: traceback.print_exc()
         self.logs.sort(key=lambda l:l.time)
         self.work_set = self.logs
 
@@ -186,7 +187,7 @@ class LogFile:
             for log in self.work_set:
                 f.write(str(log) + "\n")
 
-def parse_file(filename: str, type: LogFileType = LogFileType.UNKNOWN) -> LogFile:
+def parse_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> LogFile:
     """Parses the specified log file
     
     Parameters:
