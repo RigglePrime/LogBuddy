@@ -1,20 +1,36 @@
 #!/usr/bin/env python3
 import code
 from log_parser import LogFile, parse_file
-#import argparse
+import argparse
 import sys
 from log import Log
 from _sitebuiltins import _Helper
 import inspect
 import readline
 import rlcompleter
+import os
+import glob
 
 readline.parse_and_bind("tab: complete")
 
-#parser = argparse.ArgumentParser(description='Parses-the-logs')
+parser = argparse.ArgumentParser(description='Parses-the-logs')
 
-if len(sys.argv) < 2: raise Exception("No files provided. Usage: python main.py <logfile1> <logfile2> ...")
+parser.add_argument("-v", "--verbose", action="store_true", help="Toggle verbose mode")
+parser.add_argument("-q", "--quiet", "--silent", action="store_false", help="Toggle silent mode")
+parser.add_argument("--version", action="version", version="LogBuddy v0.1")
+parser.add_argument("file", nargs="+", help="One or multiple log files or a single folder containing log files to parse")
+args = parser.parse_args()
+
+file_list: list[str] = args.file
+if len(file_list) == 1 and os.path.isdir(file_list[0]):
+    folder = file_list[0]
+    file_list = os.listdir(folder)
+    folder = folder.replace("\\", "/")
+    if folder[-1] != "/": folder += "/"
+    file_list = [folder + file for file in file_list]
+
 main_file = parse_file(sys.argv[1])
+
 for file in sys.argv[2:]:
     main_file.collate(parse_file(file))
 
