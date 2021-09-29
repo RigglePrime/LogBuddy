@@ -1,0 +1,3 @@
+# LogBuddy
+
+WIP, early alpha
