@@ -112,7 +112,7 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         if "/" in other:
-            print(other)
+            print(other) # TODO: fix this part
         self.action = other
 
     def parse_and_set_location(self, log: str) -> int:
