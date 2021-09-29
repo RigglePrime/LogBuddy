@@ -1,7 +1,7 @@
 from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
-from math import sqrt, pow
+from math import sqrt, pow, abs
 import traceback
 
 HEARING_RANGE = 9
@@ -171,6 +171,8 @@ class LogFile:
             if log.agent and ckey == log.agent.ckey: 
                 last_loc = cur_loc
                 cur_loc = log.location
+                filtered.append(log)
+                continue
             # Check z-level, if they differ save location and continue
             if not cur_loc[2] == last_loc[2]: 
                 continue
@@ -179,8 +181,8 @@ class LogFile:
                 continue
 
             # Calculate distance
-            #if sqrt(pow(cur_loc[0], 2) + pow(cur_loc[1], 2)) - hearing_range < 0:
-            if cur_loc[0] - hearing_range < 0 and cur_loc[1] - hearing_range < 0:
+            #if sqrt(pow(cur_loc[0] - log.location[0], 2) + pow(cur_loc[1] - log.location[1], 2)) - hearing_range < 0:
+            if abs(cur_loc[0] - log.location[0]) - hearing_range < 0 and abs(cur_loc[1] - log.location[1]) - hearing_range < 0:
                 filtered.append(log)
 
         return filtered
