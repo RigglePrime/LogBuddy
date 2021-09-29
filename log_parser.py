@@ -103,7 +103,7 @@ class LogFile:
         """Removes all logs in which the specified strings are not present, saving them in `self.work_set`. Works exactly like Notepad++ bookmark
         
         Parameters:
-        strings (list[str]): strings to filter
+        strings (tuple[str, ...]): strings to filter
         
         Returns None"""
         filtered = []
