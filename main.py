@@ -29,10 +29,14 @@ if len(file_list) == 1 and os.path.isdir(file_list[0]):
     if folder[-1] != "/": folder += "/"
     file_list = [folder + file for file in file_list]
 
-main_file = parse_file(file_list[0], verbose=args.verbose)
+log_file_list: list[LogFile] = []
 
-for file in file_list[1:]:
-    main_file.collate(parse_file(file, verbose=args.verbose))
+for file in file_list:
+    print("Parsing", file)
+    log_file_list.append(parse_file(file, verbose=args.verbose))
+
+main_file = LogFile()
+[main_file.collate(lf) for lf in log_file_list]
 
 _Helper.__repr__ = lambda self: """Welcome to LogBuddy!
 Type help(Log) for information about the log, and help(LogFile) for information about log files.

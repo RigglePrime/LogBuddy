@@ -56,6 +56,15 @@ class Log:
     log = `Log("log line here")` # NOTE: must be a valid log entry"""
     def __init__(self, line: Optional[str] = None) -> None:
         if not line or line[0] != "[": raise UnknownLogException("Does not start with [")
+
+        self.time = None
+        self.agent = None
+        self.patient = None
+        self.location = None
+        self.location_name = None
+        self.text = None
+        self.is_dead = None
+
         self.raw_line = line
         dt, other = self.raw_line.split("] ", 1)
         self.time = isoparse(dt[1:]) # Remove starting [

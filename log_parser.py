@@ -35,6 +35,11 @@ class LogFile:
     sortable: bool = True
 
     def __init__(self, type: LogFileType = LogFileType.UNKNOWN, logs: list[str] = [], verbose: bool = False) -> None:
+        self.logs = [] # Python is dumb. I hate python
+        self.work_set = []
+        self.who = []
+        self.sortable = True
+        
         self.log_type = type
         for line in logs:
             try:
