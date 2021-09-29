@@ -38,6 +38,8 @@ _Helper.__repr__ = lambda self: """Welcome to LogBuddy!
 Type help(Log) for information about the log, and help(LogFile) for information about log files.
 Type functions(object) for a list of all defined functions and variables(object) for a list of all variables. Both are currently quite shitty.
 
+If -- More -- is displayed on the bottom of the screen, press enter to advance one line, space to advance a screen or q to quit.
+
 For Python's interactive help, type help(), or help(object) for help about object."""
 
 def functions(cls: object):
