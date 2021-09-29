@@ -73,6 +73,7 @@ class Log:
     location: Annotated[Optional[Tuple[int,int,int]], "X, Y, Y where the action was performed"] = None
     location_name: Annotated[Optional[str], "Name of the location where the action was performed"] = None
     text: Annotated[Optional[str], "Any remaining unparsed text"] = None
+    is_dead: Annotated[Optional[bool], "Is the agent dead?"] = None
 
     def parse_game(self, log: str) -> None:
         """Parses a game log entry from `GAME:` onwards (GAME: should not be included)"""
@@ -133,7 +134,8 @@ class Log:
         """Parses a generic SAY log entry from SAY: onwards (includes SAY, WHISPER, OOC) (should only include line from SAY: onwards, without the SAY)"""
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
-        text, location = other.split('" (', 1)
+        text, other = other.split('" ', 1)
+        
         self.is_dead = False
         if "(DEAD)" in text:
             text = text.replace("(DEAD) ", "", 1)
