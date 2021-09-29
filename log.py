@@ -47,8 +47,7 @@ class Player:
         # Above does not work since it catches "has grabbed MY NAME/(John Smith)" as the ckey "has grabbed MY NAME"
         raise Exception("Not yet implemented")
 
-class UnknownLogException(Exception):
-    pass
+class UnknownLogException(Exception): pass
 
 class Log:
     """Represents one log entry
