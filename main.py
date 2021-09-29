@@ -31,7 +31,7 @@ if len(file_list) == 1 and os.path.isdir(file_list[0]):
 
 main_file = parse_file(file_list[0], verbose=args.verbose)
 
-for file in sys.argv[1:]:
+for file in file_list[1:]:
     main_file.collate(parse_file(file, verbose=args.verbose))
 
 _Helper.__repr__ = lambda self: """Welcome to LogBuddy!
