@@ -135,12 +135,16 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         text, other = other.split('" ', 1)
+        self.text = text
+        other, location = other.split('(', 1)
+        other = other.strip()
+        if other:
+            self.text += " | " + other
         
         self.is_dead = False
         if "(DEAD)" in text:
             text = text.replace("(DEAD) ", "", 1)
             self.is_dead = True
-        self.text = text[1:] # Remove prepended "
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start]
 
