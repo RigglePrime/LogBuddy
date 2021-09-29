@@ -92,7 +92,7 @@ class LogFile:
         but only counts the agent (actor). See filter_strings for a function like Notepad++ bookmark"""
         filtered = []
         for log in self.work_set:
-            if log.agent and log.agent.ckey in ckeys: 
+            if log.agent and log.agent.ckey in ckeys:
                 filtered.append(log)
         if not filtered:
             print("Operation completed with empty set. Aborting.")
@@ -209,6 +209,6 @@ def parse_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: 
     Returns LogFile"""
     with open(filename, "r") as f:
         lines = f.readlines()
-    return LogFile(type, lines)
+    return LogFile(type, lines, verbose)
 
 if __name__ == "__main__": print("This file is a module and is not meant to be run")
