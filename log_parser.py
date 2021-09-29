@@ -2,6 +2,7 @@ from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
 from math import sqrt, pow
+from typing import Annotated
 import traceback
 
 HEARING_RANGE = 9
@@ -28,9 +29,9 @@ class LogFile:
     `log_file = LogFile(LogFileType.UNKNOWN, open("game.log").readlines())`
     `log_file = LogFile(logs=["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
     """
-    logs: list[Log] = []
-    work_set: list[Log] = []
-    who: list[str] = []
+    logs: Annotated[list[Log], "Stores a list of all logs"] = []
+    work_set: Annotated[list[Log], "Stores a list of filtered logs"] = []
+    who: Annotated[list[str], "Stores a list of all connected ckeys"] = []
     sortable: bool = True
 
     def __init__(self, type: LogFileType = LogFileType.UNKNOWN, logs: list[str] = [], verbose: bool = False) -> None:
