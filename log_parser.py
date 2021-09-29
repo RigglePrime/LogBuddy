@@ -39,14 +39,14 @@ class LogFile:
         self.work_set = []
         self.who = []
         self.sortable = True
-        
+
         self.log_type = type
         for line in logs:
             try:
                 line = line.strip("\n").strip()
                 log = Log(line)
                 self.logs.append(log)
-                if log.agent and log.agent.ckey and log.agent.ckey not in self.who: self.who.append(log.agent.ckey)
+                if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who: self.who.append(log.agent.ckey.replace("[DC]",""))
             except Exception as e:
                 print(f"Could not be parsed: '{line}', with the reason:", e)
                 if verbose: traceback.print_exc()
@@ -92,6 +92,9 @@ class LogFile:
         self.add_logs(logfile.logs)
         self.log_type = LogFileType.COLLATED
         self.logs.sort(key=lambda l:l.time)
+        self.who.extend(logfile.who)
+        self.who = list(set(self.who))
+        self.who.sort()
 
     def filter_ckeys(self, *ckeys: str):
         """Removes all logs in which the specified ckeys are not present, saving the result in self.work_set. Works much like Notepad++,
@@ -139,6 +142,7 @@ class LogFile:
         ckeys (tuple[str, ...]): ckeys to use for sorting
         
         Returns None"""
+        self.filter_ckeys(*ckeys)
         final = []
         for ckey in ckeys:
             final.extend(self.get_only_heard(ckey))
@@ -149,7 +153,6 @@ class LogFile:
         final = list(set(final))
         final.sort(key=lambda l:l.time)
         self.work_set = final
-        self.filter_ckeys(*ckeys)
 
     def reset_work_set(self):
         """Removes all filters; sets the working set to be equal to all logs"""
