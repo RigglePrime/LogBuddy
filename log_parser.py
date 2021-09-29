@@ -126,7 +126,7 @@ class LogFile:
         Returns None"""
         self.work_set = self.get_only_heard(ckey)
 
-    def filter_conversation(self, *ckeys: str):
+    def filter_conversation(self, *ckeys: str): # TODO: hide lines not in conversation
         """Tries to get a conversation between multiple parties, excluding what they would and would not hear. Only accounts for local say (for now). Saves the result in `self.work_set`
         
         Parameters:
@@ -142,7 +142,8 @@ class LogFile:
             return
         final = list(set(final))
         final.sort(key=lambda l:l.time)
-        self.filter_ckeys(ckeys)
+        self.work_set = final
+        self.filter_ckeys(*ckeys)
 
     def reset_work_set(self):
         """Removes all filters; sets the working set to be equal to all logs"""
