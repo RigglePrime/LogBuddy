@@ -40,7 +40,7 @@ class LogFile:
                 self.logs.append(log)
                 if log.agent and log.agent.ckey and log.agent.ckey not in self.who: self.who.append(log.agent.ckey)
             except Exception as e:
-                print("Could not be parsed:'", line, "', with the reason:", e)
+                print(f"Could not be parsed: '{line}', with the reason:", e)
         self.logs.sort(key=lambda l:l.time)
         self.work_set = self.logs
 
