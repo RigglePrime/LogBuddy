@@ -1,7 +1,7 @@
 from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
-from math import sqrt, pow, abs
+from math import sqrt, pow
 import traceback
 
 HEARING_RANGE = 9
