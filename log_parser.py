@@ -93,7 +93,10 @@ class LogFile:
         filtered = []
         for log in self.work_set:
             if log.agent and log.agent.ckey in ckeys: 
-                self.work_set.append(log)
+                filtered.append(log)
+        if not filtered:
+            print("Operation completed with empty set. Aborting.")
+            return
         self.work_set = filtered
 
     def filter_strings(self, *strings: str):
@@ -104,6 +107,9 @@ class LogFile:
                 if string in log.raw_line:
                     filtered.append(log)
                 break
+        if not filtered:
+            print("Operation completed with empty set. Aborting.")
+            return
         self.work_set = filtered
 
     def filter_heard(self, ckey: str) -> None:
@@ -126,6 +132,9 @@ class LogFile:
         for ckey in ckeys:
             final.extend(self.get_only_heard(ckey))
 
+        if not final:
+            print("Operation completed with empty set. Aborting.")
+            return
         final = list(set(final))
         final.sort(key=lambda l:l.time)
         self.filter_ckeys(ckeys)
@@ -173,6 +182,9 @@ class LogFile:
 
     def print_working(self) -> None:
         """Prints working set to the console"""
+        if not self.work_set:
+            print("Working set empty")
+            return
         for log in self.work_set:
             print(log.raw_line)
 
