@@ -154,3 +154,5 @@ class Log:
     def __repr__(self):
         """Object representation"""
         return self.raw_line
+
+if __name__ == "__main__": print("This file is a module and is not meant to be run")

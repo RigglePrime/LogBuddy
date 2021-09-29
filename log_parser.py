@@ -197,3 +197,5 @@ def parse_file(filename: str, type: LogFileType = LogFileType.UNKNOWN) -> LogFil
     with open(filename, "r") as f:
         lines = f.readlines()
     return LogFile(type, lines)
+
+if __name__ == "__main__": print("This file is a module and is not meant to be run")
