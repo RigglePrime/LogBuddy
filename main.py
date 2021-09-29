@@ -29,9 +29,9 @@ if len(file_list) == 1 and os.path.isdir(file_list[0]):
     if folder[-1] != "/": folder += "/"
     file_list = [folder + file for file in file_list]
 
-main_file = parse_file(sys.argv[1])
+main_file = parse_file(file_list[0])
 
-for file in sys.argv[2:]:
+for file in sys.argv[1:]:
     main_file.collate(parse_file(file))
 
 _Helper.__repr__ = lambda self: """Welcome to LogBuddy!
