@@ -1,6 +1,7 @@
 from log import Log, LogType
 from enum import Enum
 from math import sqrt, pow
+import traceback
 
 HEARING_RANGE = 9
 
@@ -41,6 +42,7 @@ class LogFile:
                 if log.agent and log.agent.ckey and log.agent.ckey not in self.who: self.who.append(log.agent.ckey)
             except Exception as e:
                 print(f"Could not be parsed: '{line}', with the reason:", e)
+                print(traceback.format_exc())
         self.logs.sort(key=lambda l:l.time)
         self.work_set = self.logs
 
