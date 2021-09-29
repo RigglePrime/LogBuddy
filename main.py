@@ -11,7 +11,7 @@ import rlcompleter
 
 readline.parse_and_bind("tab: complete")
 
-#parser = argparse.ArgumentParser(description='Parses the logs')
+#parser = argparse.ArgumentParser(description='Parses-the-logs')
 
 if len(sys.argv) < 2: raise Exception("No files provided. Usage: python main.py <logfile1> <logfile2> ...")
 main_file = parse_file(sys.argv[1])
