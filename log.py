@@ -34,7 +34,7 @@ class Player:
     @staticmethod
     def parse_player(string: str):
         """Gets player's ckey and name from the following format: 'ckey/(name)' (parentheses not required)"""
-        ckey, name = string.strip().split("/, ", 1)
+        ckey, name = string.strip().split("/", 1)
         return Player(ckey, name.strip("()"))
 
     @staticmethod
@@ -62,8 +62,8 @@ class Log:
         log_type, other = other.split(": ", 1)
         self.log_type = LogType.parse_log_type(log_type)
         # Python go brrrrrrr
-        try: getattr(self, f"parse_{self.log_type.name.lower()}")(other)
-        except: pass
+        f = getattr(self, f"parse_{self.log_type.name.lower()}", None)
+        if f: f(other)
 
     time: Annotated[datetime, "Time of logging"] = None
     agent: Annotated[Optional[Player], "Player performing the action"] = None
@@ -118,7 +118,7 @@ class Log:
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line."""
         # Find all possible location strings
-        r = re.findall("\(\d{1,3},(\d{1,3},\d{1,2}\)", log)
+        r = re.findall("\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
         if not len(r): return -1 
         # Get location of last match
@@ -136,7 +136,7 @@ class Log:
         text, location = other.split('" (', 1)
         self.is_dead = False
         if "(DEAD)" in text:
-            text = text.replace("(DEAD) ", 1)
+            text = text.replace("(DEAD) ", "", 1)
             self.is_dead = True
         self.text = text[1:] # Remove prepended "
         loc_start = self.parse_and_set_location(location)
