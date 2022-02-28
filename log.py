@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from dateutil.parser import isoparse
 from datetime import datetime
 from enum import Enum
