@@ -54,6 +54,7 @@ class LogFile:
         for line in logs:
             try:
                 line = line.strip("\n").strip()
+                if line.startswith("-censored"): continue # Skip censored lines
                 log = Log(line)
                 self.logs.append(log)
                 if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who: self.who.append(log.agent.ckey.replace("[DC]",""))
