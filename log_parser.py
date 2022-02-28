@@ -247,7 +247,7 @@ class LogFile:
 
     @staticmethod
     def from_round_id(round_id: int) -> LogFile:
-        pass
+        raise Exception("Not yet implemented!")
 
 if __name__ == "__main__":
     import sys
