@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import code
 import inspect
 import os
 from typing import Any
@@ -7,11 +6,6 @@ from typing import Any
 # Log is unused, but it's here so the user doesn't have to import it manually
 from log import Log
 from log_parser import LogFile
-
-# Autocomplete
-import readline
-import rlcompleter
-readline.parse_and_bind("tab: complete")
 
 # Change the help text, so users can more easily understand what to do
 from _sitebuiltins import _Helper
@@ -59,8 +53,8 @@ if __name__ == "__main__":
     main_file = LogFile()
     [main_file.collate(lf) for lf in log_file_list]
 
-
-    code.interact(banner="""
+    from IPython import embed
+    embed(header="""
     _                ______           _     _       
     | |               | ___ \         | |   | |      
     | |     ___   __ _| |_/ /_   _  __| | __| |_   _ 
@@ -73,5 +67,5 @@ if __name__ == "__main__":
     Switching to interactive
 
     Press tab to autocomplete
-    For help type help
+    For LogBuddy specific help type 'help' or '?' for IPython's help (without the quotes).
     """, local=locals())
