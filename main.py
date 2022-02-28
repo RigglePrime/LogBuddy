@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import code
-from log_parser import LogFile, parse_file
+from log_parser import LogFile
 import argparse
 import sys
 from log import Log
@@ -33,7 +33,7 @@ log_file_list: list[LogFile] = []
 
 for file in file_list:
     print("Parsing", file)
-    log_file_list.append(parse_file(file, verbose=args.verbose))
+    log_file_list.append(LogFile.parse_file(file, verbose=args.verbose))
 
 main_file = LogFile()
 [main_file.collate(lf) for lf in log_file_list]

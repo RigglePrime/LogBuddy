@@ -3,6 +3,7 @@ from log import Log, LogType
 from enum import Enum
 from math import sqrt, pow
 from typing import Annotated
+from __future__ import annotations
 import traceback
 
 HEARING_RANGE = 9
@@ -216,16 +217,19 @@ class LogFile:
             for log in self.work_set:
                 f.write(str(log) + "\n")
 
-def parse_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> LogFile:
-    """Parses the specified log file
-    
-    Parameters:
-    filename (str): name (and location) of the desired file
-    type (LogFileType): type of the log (can be left out)
-    
-    Returns LogFile"""
-    with open(filename, "r") as f:
-        lines = f.readlines()
-    return LogFile(type, lines, verbose)
+    @staticmethod
+    def parse_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> LogFile:
+        """Parses the specified log file
+        
+        Parameters:
+        filename (str): name (and location) of the desired file
+        type (LogFileType): type of the log (can be left out)
+        
+        Returns LogFile"""
+        with open(filename, "r") as f:
+            lines = f.readlines()
+        return LogFile(type, lines, verbose)
 
-if __name__ == "__main__": print("This file is a module and is not meant to be run")
+if __name__ == "__main__":
+    import sys
+    LogFile.parse_file(sys.argv[1]).print_working()
