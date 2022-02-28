@@ -33,18 +33,24 @@ class LogFile:
     `log_file = LogFile(LogFileType.UNKNOWN, open("game.log").readlines())`,
     `log_file = LogFile(logs=["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
     """
-    logs: Annotated[list[Log], "Stores a list of all logs"] = []
-    work_set: Annotated[list[Log], "Stores a list of filtered logs"] = []
-    who: Annotated[list[str], "Stores a list of all connected ckeys"] = []
-    sortable: bool = True
+    round_id: Annotated[int, "Stores the round ID. If unknown, it will equal -1"]
+    logs: Annotated[list[Log], "Stores a list of all logs"]
+    work_set: Annotated[list[Log], "Stores a list of filtered logs"]
+    who: Annotated[list[str], "Stores a list of all connected ckeys"]
+    sortable: bool
 
     def __init__(self, type: LogFileType = LogFileType.UNKNOWN, logs: list[str] = [], verbose: bool = False) -> None:
-        self.logs = [] # Python is dumb. I hate python
+        self.round_id = -1
+        self.logs = [] # Python is dumb. I hate python#
         self.work_set = []
         self.who = []
         self.sortable = True
 
         self.log_type = type
+        if "Starting up round ID" in logs[0]:
+            self.round_id = int(logs[0].split("Starting up round ID ")[1].strip(". "))
+            logs = logs[2:]
+
         for line in logs:
             try:
                 line = line.strip("\n").strip()
