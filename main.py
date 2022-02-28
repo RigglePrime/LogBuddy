@@ -10,6 +10,8 @@ from log_parser import LogFile
 # Change the help text, so users can more easily understand what to do
 from _sitebuiltins import _Helper
 _Helper.__repr__ = lambda self: """Welcome to LogBuddy!
+To get started, type "LogFile.from_file('game.txt')" (if there is a file named game.txt in the same directory) or "LogFile.from_folder('logs')" (if your game.txt, attack.txt... are stored in a folder named logs)
+
 Type help(Log) for information about the log, and help(LogFile) for information about log files.
 Type functions(object) for a list of all defined functions and variables(object) for a list of all variables. Both are currently quite bad (I will get to it some day I promise).
 
@@ -32,7 +34,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Toggle verbose mode")
     parser.add_argument("-q", "--quiet", "--silent", action="store_false", help="Toggle silent mode")
-    parser.add_argument("--version", action="version", version="LogBuddy v0.1")
+    parser.add_argument("--version", action="version", version="LogBuddy v0.2")
     parser.add_argument("file", nargs="*", help="One or multiple log files or a single folder containing log files to parse")
     args = parser.parse_args()
 
@@ -44,7 +46,7 @@ if __name__ == "__main__":
         else:
             for file in args.file:
                 if args.verbose: print("Parsing", file)
-                main_file.collate(LogFile.parse_file(file, verbose=args.verbose))
+                main_file.collate(LogFile.from_file(file, verbose=args.verbose))
 
     from IPython import embed
     embed(header="""
