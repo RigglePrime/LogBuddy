@@ -221,7 +221,7 @@ class LogFile:
                 f.write(str(log) + "\n")
 
     @staticmethod
-    def parse_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> LogFile:
+    def from_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> LogFile:
         """Parses the specified log file
         
         Parameters:
@@ -242,7 +242,7 @@ class LogFile:
         log_collection = LogFile()
         for file in os.listdir(folder):
             if verbose: print("Parsing", file)
-            log_collection.collate(LogFile.parse_file(folder + file, verbose=verbose))
+            log_collection.collate(LogFile.from_file(folder + file, verbose=verbose))
         return log_collection
 
     @staticmethod
@@ -251,4 +251,4 @@ class LogFile:
 
 if __name__ == "__main__":
     import sys
-    LogFile.parse_file(sys.argv[1]).print_working()
+    LogFile.from_file(sys.argv[1]).print_working()
