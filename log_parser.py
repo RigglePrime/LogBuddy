@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
 from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
 from math import sqrt, pow
 from typing import Annotated
-from __future__ import annotations
 import traceback
 
 HEARING_RANGE = 9
@@ -229,6 +231,10 @@ class LogFile:
         with open(filename, "r") as f:
             lines = f.readlines()
         return LogFile(type, lines, verbose)
+
+    @staticmethod
+    def from_round_id(round_id: int):
+        pass
 
 if __name__ == "__main__":
     import sys
