@@ -85,7 +85,7 @@ class LogFile:
         if not self.sortable: raise NotSortableException("Not enough information to sort the logs")
         self.work_set.sort(key=lambda l:l.time)
 
-    def collate(self, logfile) -> None:
+    def collate(self, logfile: LogFile) -> None:
         """Collates (extends, adds together) two LogFile objects and changes the LogFileType to COLLATED.
         
         Parameters:
