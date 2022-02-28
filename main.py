@@ -36,22 +36,15 @@ if __name__ == "__main__":
     parser.add_argument("file", nargs="+", help="One or multiple log files or a single folder containing log files to parse")
     args = parser.parse_args()
 
-    file_list: list[str] = args.file
-    if len(file_list) == 1 and os.path.isdir(file_list[0]):
-        folder = file_list[0]
-        file_list = os.listdir(folder)
-        folder = folder.replace("\\", "/")
-        if folder[-1] != "/": folder += "/"
-        file_list = [folder + file for file in file_list]
-
-    log_file_list: list[LogFile] = []
-
-    for file in file_list:
-        print("Parsing", file)
-        log_file_list.append(LogFile.parse_file(file, verbose=args.verbose))
-
     main_file = LogFile()
-    [main_file.collate(lf) for lf in log_file_list]
+
+    if args.file:
+        if len(args.file) == 1 and os.path.isdir(args.file[0]):
+            main_file = LogFile.from_folder(args.file[0], verbose=args.verbose)
+        else:
+            for file in args.file:
+                if args.verbose: print("Parsing", file)
+                main_file.collate(LogFile.parse_file(file, verbose=args.verbose))
 
     from IPython import embed
     embed(header="""

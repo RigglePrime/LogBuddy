@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from __future__ import annotations
+import os
 from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
@@ -233,7 +234,19 @@ class LogFile:
         return LogFile(type, lines, verbose)
 
     @staticmethod
-    def from_round_id(round_id: int):
+    def from_folder(folder: str, verbose: bool = False):
+        """Parses all log files in a folder"""
+        if not os.path.isdir(folder): raise Exception("Is not a folder")
+        folder = folder.replace("\\", "/")
+        if folder[-1] != "/": folder += "/"
+        log_collection = LogFile()
+        for file in os.listdir(folder):
+            if verbose: print("Parsing", file)
+            log_collection.collate(LogFile.parse_file(folder + file, verbose=verbose))
+        return log_collection
+
+    @staticmethod
+    def from_round_id(round_id: int) -> LogFile:
         pass
 
 if __name__ == "__main__":
