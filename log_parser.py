@@ -28,8 +28,8 @@ class LogFile:
 
     Examples:
 
-    `log_file = LogFile()`
-    `log_file = LogFile(LogFileType.UNKNOWN, open("game.log").readlines())`
+    `log_file = LogFile()`,
+    `log_file = LogFile(LogFileType.UNKNOWN, open("game.log").readlines())`,
     `log_file = LogFile(logs=["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
     """
     logs: Annotated[list[Log], "Stores a list of all logs"] = []
