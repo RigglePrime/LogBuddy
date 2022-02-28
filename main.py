@@ -48,17 +48,17 @@ if __name__ == "__main__":
 
     from IPython import embed
     embed(header="""
-    _                ______           _     _       
-    | |               | ___ \         | |   | |      
-    | |     ___   __ _| |_/ /_   _  __| | __| |_   _ 
-    | |    / _ \ / _` | ___ \ | | |/ _` |/ _` | | | |
-    | |___| (_) | (_| | |_/ / |_| | (_| | (_| | |_| |
-    \_____/\___/ \__, \____/ \__,_|\__,_|\__,_|\__, |
-                __/ |                         __/ |
-                |___/                         |___/ 
-                
-    Switching to interactive
+_                ______           _     _       
+| |               | ___ \         | |   | |      
+| |     ___   __ _| |_/ /_   _  __| | __| |_   _ 
+| |    / _ \ / _` | ___ \ | | |/ _` |/ _` | | | |
+| |___| (_) | (_| | |_/ / |_| | (_| | (_| | |_| |
+\_____/\___/ \__, \____/ \__,_|\__,_|\__,_|\__, |
+            __/ |                         __/ |
+            |___/                         |___/ 
+            
+Switching to interactive
 
-    Press tab to autocomplete
-    For LogBuddy specific help type 'help' or '?' for IPython's help (without the quotes).
-    """, local=locals())
+Press tab to autocomplete
+For LogBuddy specific help type 'help' or '?' for IPython's help (without the quotes).
+""", local=locals())
