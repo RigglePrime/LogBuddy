@@ -229,12 +229,13 @@ class Log:
             # "has hit", # I don't think this is ever used against players, so I'll leave it out
             "has kicks" # Another typo... feel free to fix for free GBP since we already have "kicked"
         )):
-            other_temp = other.split(" ", 1)[2]
+            print(other)
+            other_temp = other.split(" ", 2)[2]
             parse_key = True
         # Splashed has a special case :)))
         elif other.startswith("has splashed"):
             other_temp = other.replace("(thrown) ", "")
-            other_temp = other_temp.split(" ", 1)[2]
+            other_temp = other_temp.split(" ", 2)[2]
             parse_key = True
         # Three words
         elif other.startswith((
@@ -251,7 +252,7 @@ class Log:
             "has broke grab",
             "has head slammed"
         )):
-            other_temp = other.split(" ", 1)[3]
+            other_temp = other.split(" ", 3)[3]
             parse_key = True
         # Four words
         elif other.startswith("has") and other.startswith((
@@ -264,15 +265,15 @@ class Log:
             "has attempted to apply",
             "has failed to handcuff"
         )):
-            other_temp = other.split(" ", 1)[4]
+            other_temp = other.split(" ", 4)[4]
             parse_key = True
         # Five words
         elif other.startswith(("has tended to the wounds", "has attempted to neck grab", "has overloaded the heart of")):
-            other_temp = other.split(" ", 1)[5]
+            other_temp = other.split(" ", 5)[5]
             parse_key = True
 
         if parse_key:
-            patient = other_temp.split(") ")[0]
+            patient = other_temp.split(") ", 1)[0]
             self.patient = Player.parse_player(patient)
             del other_temp
         # NOTE: surgery related logs were not added, as they are quite rare and I don't think they'd contribute much. Feel free
@@ -298,7 +299,7 @@ class Log:
         self.agent = Player.parse_player(agent)
 
         if self.silicon_log_type == SiliconLogType.LAW and other.startswith("used "):
-            agent = other.split(" on ", 1)[1].split(") ")[0]
+            agent = other.split(" on ", 1)[1].split(") ", 1)[0]
             self.agent = Player.parse_player(agent)
         self.text = other
         # NOTE: someone PLEASE fix logging this is getting ridiculous
