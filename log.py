@@ -92,19 +92,19 @@ class Log:
         """Parses a game log entry from `ACCESS:` onwards (ACCESS: should not be included)"""
         self.text = log
 
-    def parse_admin(self, log: str):
+    def parse_admin(self, log: str) -> None:
         """Parses a game log entry from `ADMIN:` onwards (ADMIN: should not be included)"""
         self.text = log
 
-    def parse_ooc(self, log: str):
+    def parse_ooc(self, log: str) -> None:
         """Parses a game log entry from `OOC:` onwards (OOC: should not be included)"""
         self.generic_say_parse(log)
 
-    def parse_say(self, log: str):
+    def parse_say(self, log: str) -> None:
         """Parses a game log entry from `SAY:` onwards (SAY: should not be included)"""
         self.generic_say_parse(log)
 
-    def parse_whisper(self, log: str):
+    def parse_whisper(self, log: str) -> None:
         """Parses a game log entry from `WHISPER:` onwards (WHISPER: should not be included)"""
         self.generic_say_parse(log)
 
