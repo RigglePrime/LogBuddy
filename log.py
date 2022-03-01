@@ -119,6 +119,7 @@ class Log:
 
     def parse_adminprivate(self, log: str) -> None:
         """Parses a game log entry from `ADMINPRIVATE:` onwards (ADMINPRIVATE: should not be included)"""
+        # TODO: add better parsing for tickets
         self.text = log
 
     def parse_ooc(self, log: str) -> None:
