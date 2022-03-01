@@ -322,6 +322,8 @@ class Log:
     def parse_mecha(self, log: str) -> None:
         """Parses a game log entry from `MECHA:` onwards (MECHA: should not be included)"""
         self.text = log.strip()
+        loc_start = self.parse_and_set_location(log)
+        self.location_name = log[:loc_start].split("(")[-1].strip()
 
     def parse_paper(self, log: str) -> None:
         """Parses a game log entry from `PAPER:` onwards (PAPER: should not be included)"""
