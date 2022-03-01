@@ -74,15 +74,15 @@ class Log:
         f = getattr(self, f"parse_{self.log_type.name.lower()}", None)
         if f: f(other)
 
-    time: Annotated[datetime, "Time of logging"] = None
-    agent: Annotated[Optional[Player], "Player performing the action"] = None
-    patient: Annotated[Optional[Player], "Player receiving the action"] = None
-    raw_line: Annotated[str, "Raw, unmodified line"] = None
-    log_type: Annotated[LogType, "Type of the log"] = None
-    location: Annotated[Optional[Tuple[int,int,int]], "X, Y, Y where the action was performed"] = None
-    location_name: Annotated[Optional[str], "Name of the location where the action was performed"] = None
-    text: Annotated[Optional[str], "Any remaining unparsed text"] = None
-    is_dead: Annotated[Optional[bool], "Is the agent dead?"] = None
+    time: Annotated[datetime, "Time of logging"]
+    agent: Annotated[Optional[Player], "Player performing the action"]
+    patient: Annotated[Optional[Player], "Player receiving the action"]
+    raw_line: Annotated[str, "Raw, unmodified line"]
+    log_type: Annotated[LogType, "Type of the log"]
+    location: Annotated[Optional[Tuple[int,int,int]], "X, Y, Y where the action was performed"]
+    location_name: Annotated[Optional[str], "Name of the location where the action was performed"]
+    text: Annotated[Optional[str], "Any remaining unparsed text"]
+    is_dead: Annotated[Optional[bool], "Is the agent dead?"]
 
     def parse_game(self, log: str) -> None:
         """Parses a game log entry from `GAME:` onwards (GAME: should not be included)"""
