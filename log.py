@@ -22,6 +22,7 @@ class LogType(Enum):
     VOTE = 11
     SILICON = 12
     PDA = 13
+    MECHA = 14
 
     @staticmethod
     def parse_log_type(string: str):
@@ -316,6 +317,10 @@ class Log:
         self.text = pda_type + " " + html_unescape(text.strip())
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start].strip()
+
+    def parse_mecha(self, log: str) -> None:
+        """Parses a game log entry from `MECHA:` onwards (MECHA: should not be included)"""
+        self.text = log.strip()
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
