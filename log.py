@@ -15,9 +15,10 @@ class LogType(Enum):
     SAY = 5
     WHISPER = 6
     EMOTE = 7
-    ATTACK = 8
-    VOTE = 9
-    SILICON = 10
+    RADIOEMOTE = 8
+    ATTACK = 9
+    VOTE = 10
+    SILICON = 11
 
     @staticmethod
     def parse_log_type(string: str):
@@ -127,6 +128,10 @@ class Log:
         self.text = action
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start]
+
+    def parse_radioemote(self, log: str) -> None:
+        """Parses a game log entry from `RADIOEMOTE:` onwards (RADIOEMOTE: should not be included)"""
+        self.parse_emote(log)
 
     def parse_attack(self, log: str) -> None:
         """Parses a game log entry from `ATTACK:` onwards (ATTACK: should not be included)"""
