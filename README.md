@@ -20,6 +20,7 @@ LogBuddy is a helper tool for reading log files. It has features to:
 - mecha.txt
 - telecomms.txt
 - uplink.txt
+- shuttle.txt
 
 ## How it works
 

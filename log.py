@@ -387,6 +387,16 @@ class Log:
         self.is_dead = False
         # Maybe in the future I could add a telecrystals variable, but I don't see a need
 
+    def parse_shuttle(self, log: str) -> None:
+        """Parses a game log entry from `SHUTTLE:` onwards (SHUTTLE: should not be included)"""
+        if log.startswith("Shuttle call reason:"):
+            self.text = html_unescape(log.strip())
+            return
+
+        agent, other = log.split(") ", 1)
+        self.agent = Player.parse_player(agent)
+        self.text = html_unescape(other.strip())
+
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
         
