@@ -287,7 +287,11 @@ class LogFile:
         self.work_set = filtered
 
     def print_working(self) -> None:
-        """Prints working set to the console"""
+        """Prints working set to the console
+        
+        Example call: `my_log.print_working()`
+        
+        Returns `None`"""
         if not self.work_set:
             print("Working set empty")
             return
