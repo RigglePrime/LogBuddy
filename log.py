@@ -5,6 +5,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Annotated, Tuple, Optional
 import re
+from html import unescape as html_unescape
 
 class LogType(Enum):
     UNKNOWN = 0
@@ -176,7 +177,7 @@ class Log:
         patient, other = other.split(') "', 1)
         self.patient = Player(None, patient)
         text, location = other.split('" (')
-        self.text = text
+        self.text = html_unescape(text)
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start].strip()
 
@@ -202,7 +203,7 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         text, other = other.split('" ', 1)
-        self.text = text
+        self.text = html_unescape(text)
         other, location = other.split('(', 1)
         other = other.strip()
         if other:
