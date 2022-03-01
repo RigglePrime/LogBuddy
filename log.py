@@ -19,6 +19,7 @@ class LogType(Enum):
     ATTACK = 9
     VOTE = 10
     SILICON = 11
+    PDA = 12
 
     @staticmethod
     def parse_log_type(string: str):
@@ -166,6 +167,18 @@ class Log:
         self.text = other
         # NOTE: someone PLEASE fix logging this is getting ridiculous
         # NOTE: there is no reliable way of getting the second key here
+
+    def parse_pda(self, log: str) -> None:
+        """Parses a game log entry from `PDA:` onwards (PDA: should not be included)"""
+        agent, other = log.split(") ", 1)
+        self.agent = Player.parse_player(agent)
+        pda_type, other = other.strip(" (").split(" to ", 1)
+        patient, other = other.split(') "', 1)
+        self.patient = Player(None, patient)
+        text, location = other.split('" (')
+        self.text = text
+        loc_start = self.parse_and_set_location(location)
+        self.location_name = location[:loc_start].strip()
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
