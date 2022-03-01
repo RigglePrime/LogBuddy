@@ -30,8 +30,8 @@ class LogFile:
     Examples:
 
     `log_file = LogFile()`,
-    `log_file = LogFile(LogFileType.UNKNOWN, open("game.log").readlines())`,
-    `log_file = LogFile(logs=["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
+    `log_file = LogFile(open("game.log").readlines(), LogFileType.UNKNOWN)`,
+    `log_file = LogFile(["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
     """
     round_id: Annotated[int, "Stores the round ID. If unknown, it will equal -1"]
     logs: Annotated[list[Log], "Stores a list of all logs"]
@@ -39,14 +39,15 @@ class LogFile:
     who: Annotated[list[str], "Stores a list of all connected ckeys"]
     sortable: bool
 
-    def __init__(self, type: LogFileType = LogFileType.UNKNOWN, logs: list[str] = [], verbose: bool = False) -> None:
+    def __init__(self, logs: list[str] = [], type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> None:
         self.round_id = -1
         self.logs = [] # Python is dumb. I hate python#
         self.work_set = []
         self.who = []
         self.sortable = True
-
         self.log_type = type
+        
+        if not logs: return
         if "Starting up round ID" in logs[0]:
             self.round_id = int(logs[0].split("Starting up round ID ")[1].strip(". "))
             logs = logs[2:]
@@ -239,7 +240,7 @@ class LogFile:
         Returns LogFile"""
         with open(filename, "r") as f:
             lines = f.readlines()
-        return LogFile(type, lines, verbose)
+        return LogFile(lines, type, verbose)
 
     @staticmethod
     def from_folder(folder: str, verbose: bool = False):
@@ -254,8 +255,25 @@ class LogFile:
         return log_collection
 
     @staticmethod
-    def from_round_id(round_id: int) -> LogFile:
-        raise Exception("Not yet implemented!")
+    def from_logs_link(link: str, logs_we_care_about: list[str] = None, verbose: bool = False) -> LogFile:
+        """Downloads multiple files from a public logs link. The link should look like
+        `https://tgstation13.org/parsed-logs/{server}/data/logs/{year}/{month}/{day}/round-{round_id}/`,
+        but with actual values inserted.
+
+        `logs_we_care_about` is a list of strings, containing the file names. For example: `["game.txt", "attack.txt"]`
+        """
+        import requests as req
+        # Should be all supported log types as a default. Don't forget to update this list! (you will)
+        if not logs_we_care_about: logs_we_care_about = ["game.txt", "attack.txt"]
+        if not link[-1] == "/": link += "/"
+        log_collection = LogFile()
+        for log_file in logs_we_care_about:
+            r = req.get(link + str(log_file))
+            if not r.ok:
+                print(f"Error {r.status_code} while retrieving {log_file}")
+                continue
+            log_collection.collate(LogFile(r.text.replace("\r", "").split("\n")))
+        return log_collection
 
 if __name__ == "__main__":
     import sys
