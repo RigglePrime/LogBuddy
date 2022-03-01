@@ -15,6 +15,8 @@ To get started, type "LogFile.from_file('game.txt')" (if there is a file named g
 Type help(Log) for information about the log, and help(LogFile) for information about log files.
 Type functions(object) for a list of all defined functions and variables(object) for a list of all variables. Both are currently quite bad (I will get to it some day I promise).
 
+LogBuddy performs all operations on an internal work set, so you can chain filters (functions). To reset the work set, call reset_work_set on your log instance.
+
 If -- More -- is displayed on the bottom of the screen, press enter to advance one line, space to advance a screen or q to quit.
 
 For Python's interactive help, type help(), or help(object) for help about object."""
