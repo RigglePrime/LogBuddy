@@ -23,6 +23,7 @@ class LogType(Enum):
     SILICON = 12
     PDA = 13
     MECHA = 14
+    PAPER = 15
 
     @staticmethod
     def parse_log_type(string: str):
@@ -321,6 +322,12 @@ class Log:
     def parse_mecha(self, log: str) -> None:
         """Parses a game log entry from `MECHA:` onwards (MECHA: should not be included)"""
         self.text = log.strip()
+
+    def parse_paper(self, log: str) -> None:
+        """Parses a game log entry from `PAPER:` onwards (PAPER: should not be included)"""
+        agent, other = log.split(") ", 1)
+        self.agent = Player.parse_player(agent)
+        self.text = other.strip()
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
