@@ -18,6 +18,7 @@ LogBuddy is a helper tool for reading log files. It has features to:
 - virus.txt
 - paper.txt
 - mecha.txt
+- telecomms.txt
 
 ## How it works
 

@@ -25,6 +25,7 @@ class LogType(Enum):
     MECHA = 14
     PAPER = 15
     VIRUS = 16
+    TCOMMS = 17
 
     @staticmethod
     def parse_log_type(string: str):
@@ -130,6 +131,9 @@ class Log:
 
     # Virus specific
     virus_name: Annotated[SiliconLogType, "If log type is virus, it will store the virus name"]
+
+    #Telecomms specific
+    telecomms_network: Annotated[str, "If log type is TCOMMS, the network on which the message was spoken on will be stored here"]
 
     def parse_game(self, log: str) -> None:
         """Parses a game log entry from `GAME:` onwards (GAME: should not be included)"""
@@ -351,6 +355,27 @@ class Log:
         # Location is available in both cases
         loc_start = self.parse_and_set_location(log)
         self.location_name = log[:loc_start].split("(")[-1].strip()
+
+    def parse_tcomms(self, log: str) -> None:
+        """Parses a game log entry from `TCOMMS:` onwards (TCOMMS: should not be included)"""
+        if not " (spans: " in log:
+            # We only care about what people said on telecomms, not what device connected where
+            return
+
+        self.is_dead = False
+        agent, other = log.split(" [", 1)
+        if ("/(") in agent:
+            self.agent = Player.parse_player(agent)
+        else:
+            self.agent = Player(None, agent)
+        channel, other = other.split("] (", 1)
+        self.telecomms_network = channel
+        spans, other = other.split(') "', 1)
+        text, other = other.split('" (', 1)
+        self.text = html_unescape(text.strip())
+        language, location = other.split(") (", 1)
+        loc_start = self.parse_and_set_location(location)
+        self.location_name = location[:loc_start].strip()
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
