@@ -75,11 +75,11 @@ write a custom sort function, the world's your oyster!
 To run:
 
 - `pip install -r requirements.txt`
-- `python main.py`
+- `python LogBuddy.py`
 
 Optionally:
 
-- `python main.py logs`, where `./logs/` is a folder that contains logs (all will
+- `python LogBuddy.py logs`, where `./logs/` is a folder that contains logs (all will
 be parsed)
 
 I recommend creating a virtual environment, but it's not necessary. If you don't
