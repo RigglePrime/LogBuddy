@@ -1,12 +1,20 @@
 # LogBuddy
 
 LogBuddy is a helper tool for reading log files. It has features to:
+
 - combine multiple log files
 - sort them however you want
 - filter out logs by who performed the action, where it happened
 - filter out logs that a person couldn't have heard or seen
 - work with multiple filters (filter the filtered output)
 - write the resulting set to a file
+
+## Currently supported log files
+
+- game.txt
+- attack.txt
+- pda.txt
+- silicon.txt
 
 ## Running
 
