@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Parses-the-logs')
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Toggle verbose mode")
-    parser.add_argument("-q", "--quiet", "--silent", action="store_false", help="Toggle silent mode")
+    parser.add_argument("-q", "--quiet", "--silent", action="store_true", help="Toggle silent mode")
     parser.add_argument("--version", action="version", version="LogBuddy v0.2")
     parser.add_argument("file", nargs="*", help="One or multiple log files or a single folder containing log files to parse")
     args = parser.parse_args()
