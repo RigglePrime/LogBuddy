@@ -126,7 +126,9 @@ class Log:
         self.action = other
 
     def parse_and_set_location(self, log: str) -> int:
-        """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line."""
+        """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
+        
+        Returns the position of the location in the string as in integer"""
         # Find all possible location strings
         r = re.findall("\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
