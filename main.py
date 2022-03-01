@@ -40,6 +40,10 @@ if __name__ == "__main__":
     parser.add_argument("file", nargs="*", help="One or multiple log files or a single folder containing log files to parse")
     args = parser.parse_args()
 
+    if args.verbose and args.quiet:
+        print("Really? You want me to be silent and verbose? Those are mutually exclusive you know")
+        exit(1)
+
     main_file = LogFile()
 
     if args.file:
@@ -48,7 +52,7 @@ if __name__ == "__main__":
         else:
             for file in args.file:
                 if args.verbose: print("Parsing", file)
-                main_file.collate(LogFile.from_file(file, verbose=args.verbose))
+                main_file.collate(LogFile.from_file(file, verbose=args.verbose, quiet=args.quiet))
 
     from IPython import embed
     embed(header="""

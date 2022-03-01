@@ -25,8 +25,10 @@ class LogFile:
     """An object representing a log file. Most functions use `self.work_set`, original logs sotred in `self.logs`.
 
     Parameters:
-    type (LogFileType): type of the log file
     logs (list[str]): list of log lines
+    type (LogFileType): type of the log file
+    verbose (bool): toggles verbose mode
+    quiet (bool): toggles quiet mode
 
     Examples:
 
@@ -40,7 +42,9 @@ class LogFile:
     who: Annotated[list[str], "Stores a list of all connected ckeys"]
     sortable: bool
 
-    def __init__(self, logs: list[str] = [], type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> None:
+    def __init__(self, logs: list[str] = [], type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> None:
+        if verbose and quiet:
+            print("Really? You want me to be silent and verbose? Those are mutually exclusive you know")
         self.round_id = -1
         self.logs = [] # Python is dumb. I hate Python
         self.work_set = []
@@ -65,7 +69,7 @@ class LogFile:
                 self.logs.append(log)
                 if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who: self.who.append(log.agent.ckey.replace("[DC]",""))
             except Exception as e:
-                print(f"Could not be parsed: '{line}', with the reason:", e)
+                if not quiet: print(f"Could not be parsed: '{line}', with the reason:", e)
                 if verbose: traceback.print_exc()
         self.logs.sort(key=lambda l:l.time)
         self.work_set = self.logs
@@ -235,7 +239,7 @@ class LogFile:
                 f.write(str(log) + "\n")
 
     @staticmethod
-    def from_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> LogFile:
+    def from_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> LogFile:
         """Parses the specified log file
         
         Parameters:
@@ -246,26 +250,26 @@ class LogFile:
         if filename.endswith(".html"): UnsupportedLogTypeException(f"{filename} does not seem to be supported")
         with open(filename, "r") as f:
             lines = f.readlines()
-        return LogFile(lines, type, verbose)
+        return LogFile(lines, type, verbose, quiet)
 
     @staticmethod
-    def from_folder(folder: str, verbose: bool = False):
+    def from_folder(folder: str, verbose: bool = False, quiet: bool = False):
         """Parses all log files in a folder"""
         if not os.path.isdir(folder): raise Exception("Is not a folder")
         folder = folder.replace("\\", "/")
         if folder[-1] != "/": folder += "/"
         log_collection = LogFile()
         for file in os.listdir(folder):
-            print("Parsing", file)
+            if not quiet: print("Parsing", file)
             try:
-                log_collection.collate(LogFile.from_file(folder + file, verbose=verbose))
+                log_collection.collate(LogFile.from_file(folder + file, verbose=verbose, quiet=quiet))
             except UnsupportedLogTypeException:
-                print(f"{file} isn't supported, skipping")
+                if not quiet: print(f"{file} isn't supported, skipping")
                 continue
         return log_collection
 
     @staticmethod
-    def from_logs_link(link: str, logs_we_care_about: list[str] = None, verbose: bool = False) -> LogFile:
+    def from_logs_link(link: str, logs_we_care_about: list[str] = None, verbose: bool = False, quiet: bool = False) -> LogFile:
         """Downloads multiple files from a public logs link. The link should look like
         `https://tgstation13.org/parsed-logs/{server}/data/logs/{year}/{month}/{day}/round-{round_id}/`,
         but with actual values inserted.
@@ -280,9 +284,9 @@ class LogFile:
         for log_file in logs_we_care_about:
             r = req.get(link + str(log_file))
             if not r.ok:
-                print(f"Error {r.status_code} while retrieving {log_file}")
+                if not quiet: print(f"Error {r.status_code} while retrieving {log_file}")
                 continue
-            log_collection.collate(LogFile(r.text.replace("\r", "").split("\n")))
+            log_collection.collate(LogFile(r.text.replace("\r", "").split("\n"), verbose=verbose, quiet=quiet))
         return log_collection
 
 if __name__ == "__main__":
