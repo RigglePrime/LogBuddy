@@ -273,7 +273,8 @@ class Log:
 
         if parse_key and not other_temp[0] == "[":
             patient = other_temp.split(") ", 1)[0]
-            self.patient = Player.parse_player(patient)
+            if "/(" in patient:
+                self.patient = Player.parse_player(patient)
             del other_temp
         # NOTE: surgery related logs were not added, as they are quite rare and I don't think they'd contribute much. Feel free
         # to add them yourself. (example: "has surgically removed")
