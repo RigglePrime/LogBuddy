@@ -278,7 +278,7 @@ class LogFile:
         """
         import requests as req
         # Should be all supported log types as a default. Don't forget to update this list! (you will)
-        if not logs_we_care_about: logs_we_care_about = ["game.txt", "attack.txt", "pda.txt", "silicon.txt", "virus.txt"]
+        if not logs_we_care_about: logs_we_care_about = ["game.txt", "attack.txt", "pda.txt", "silicon.txt", "mecha.txt", "virus.txt"]
         if not link[-1] == "/": link += "/"
         log_collection = LogFile()
         for log_file in logs_we_care_about:
