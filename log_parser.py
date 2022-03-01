@@ -41,7 +41,7 @@ class LogFile:
 
     def __init__(self, logs: list[str] = [], type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False) -> None:
         self.round_id = -1
-        self.logs = [] # Python is dumb. I hate python#
+        self.logs = [] # Python is dumb. I hate Python
         self.work_set = []
         self.who = []
         self.sortable = True
