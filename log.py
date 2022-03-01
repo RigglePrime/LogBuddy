@@ -39,6 +39,12 @@ class Player:
     def __init__(self, ckey: str, mob_name: str) -> None:
         self.ckey = None if ckey == "*no key*" else ckey
         self.mob_name = mob_name
+    
+    def __str__(self) -> str:
+        return f"{self.ckey}/({self.mob_name})"
+
+    def __repr__(self) -> str:
+        return f"{self.ckey}/({self.mob_name})"
 
     @staticmethod
     def parse_player(string: str):
@@ -203,4 +209,6 @@ class Log:
         return self.raw_line
 
 if __name__ == "__main__":
-    print(Log(input()))
+    log = Log(input())
+    print(log)
+    print(log.__dict__)
