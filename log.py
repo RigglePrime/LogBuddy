@@ -384,6 +384,7 @@ class Log:
         agent, other = log.split(") ", 1)
         self.agent = Player.parse_player(agent)
         self.text = html_unescape(other.strip())
+        self.is_dead = False
         # Maybe in the future I could add a telecrystals variable, but I don't see a need
 
     def parse_and_set_location(self, log: str) -> int:
