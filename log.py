@@ -27,6 +27,7 @@ class LogType(Enum):
     VIRUS = 16
     TCOMMS = 17
     UPLINK = 18
+    SHUTTLE = 19
 
     @staticmethod
     def parse_log_type(string: str):
@@ -380,7 +381,7 @@ class Log:
 
     def parse_uplink(self, log: str) -> None:
         """Parses a game log entry from `UPLINK:` onwards (UPLINK: should not be included)"""
-        agent, other = log.split(" [", 1)
+        agent, other = log.split(") ", 1)
         self.agent = Player.parse_player(agent)
         self.text = html_unescape(other.strip())
         # Maybe in the future I could add a telecrystals variable, but I don't see a need
