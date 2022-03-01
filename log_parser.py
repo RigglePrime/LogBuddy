@@ -196,7 +196,7 @@ class LogFile:
         last_loc = cur_loc
         for log in self.work_set:
             # Check for ckey. If our target was included in the action we can safely assume they saw it
-            if (log.agent and ckey == log.agent.ckey) or (log.patient and ckey == log.patient.ckey): 
+            if (log.agent and ckey == log.agent.ckey) or (log.patient and ckey == log.patient.ckey) or (log.text and f"{ckey}/(" in log.text): 
                 # If there's a location attached, update it
                 if log.location:
                     last_loc = cur_loc
