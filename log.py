@@ -12,15 +12,16 @@ class LogType(Enum):
     ACCESS = 1
     GAME = 2
     ADMIN = 3
-    OOC = 4
-    SAY = 5
-    WHISPER = 6
-    EMOTE = 7
-    RADIOEMOTE = 8
-    ATTACK = 9
-    VOTE = 10
-    SILICON = 11
-    PDA = 12
+    ADMINPRIVATE = 4
+    OOC = 5
+    SAY = 6
+    WHISPER = 7
+    EMOTE = 8
+    RADIOEMOTE = 9
+    ATTACK = 10
+    VOTE = 11
+    SILICON = 12
+    PDA = 13
 
     @staticmethod
     def parse_log_type(string: str):
@@ -114,6 +115,10 @@ class Log:
 
     def parse_admin(self, log: str) -> None:
         """Parses a game log entry from `ADMIN:` onwards (ADMIN: should not be included)"""
+        self.text = log
+
+    def parse_adminprivate(self, log: str) -> None:
+        """Parses a game log entry from `ADMINPRIVATE:` onwards (ADMINPRIVATE: should not be included)"""
         self.text = log
 
     def parse_ooc(self, log: str) -> None:
