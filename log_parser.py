@@ -6,7 +6,7 @@ from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
 from math import sqrt, pow
-from typing import Annotated
+from typing import Annotated, Union, Literal
 import traceback
 
 HEARING_RANGE = 9
@@ -25,14 +25,14 @@ class LogFile:
     """An object representing a log file. Most functions use `self.work_set`, original logs sotred in `self.logs`.
 
     Parameters:
-    logs (list[str]): list of log lines
-    type (LogFileType): type of the log file
-    verbose (bool): toggles verbose mode
-    quiet (bool): toggles quiet mode
+    `logs` (list[str]): list of log lines
+    `type` (LogFileType): type of the log file
+    `verbose` (bool): toggles verbose mode
+    `quiet` (bool): toggles quiet mode
 
     Examples:
 
-    `log_file = LogFile()`,
+    `log_file = LogFile() # Empty log file, useful for combining more later using `collate``,
     `log_file = LogFile(open("game.log").readlines(), LogFileType.UNKNOWN)`,
     `log_file = LogFile(["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
     """
@@ -75,10 +75,10 @@ class LogFile:
         self.work_set = self.logs
 
     def add_log(self, log: Log) -> None:
-        """Appends a log entry to the end.
+        """Appends a log entry to the end. This will not sort the logs or reset the current workset.
         
         Parameters:
-        log (Log): the Log object to be added
+        `log` (Log): the Log object to be added
 
         NOTE: the log variable MUST be of type Log
 
@@ -88,7 +88,7 @@ class LogFile:
         self.logs.append(log)
 
     def add_logs(self, logs: list[Log]) -> None:
-        """Appends a list of log entries to the end.
+        """Appends a list of log entries to the end. This will not sort the logs or reset the current workset.
         
         Parameters:
         logs (list[Log]): the Log objects list to be added
@@ -98,17 +98,25 @@ class LogFile:
         self.logs.extend(logs)
 
     def sort(self) -> None:
-        """Sorts the current work set, using the time at which the log was added, descending"""
+        """Sorts the current work set, using the time at which the log was added, descending
+        
+        Example call: `my_log.sort()`
+        
+        Returns None"""
         if not self.sortable: raise NotSortableException("Not enough information to sort the logs")
         self.work_set.sort(key=lambda l:l.time)
 
     def collate(self, logfile: LogFile) -> None:
         """Collates (extends, adds together) two LogFile objects and changes the LogFileType to COLLATED.
+        The result is stored in the the object this was called on. A call to this function will reset the
+        current work set.
         
         Parameters:
-        logfile (LogFile): 
+        `logfile` (LogFile): the LogFile object you want to combine
 
-        Returns None
+        Example: `my_log = LogFile()` `my_log.collate(LogFile.from_file("game.txt"))` `my_log.collate(LogFile.from_file("attack.txt"))`
+
+        Returns `None`
         """
         self.add_logs(logfile.logs)
         self.log_type = LogFileType.COLLATED
@@ -116,10 +124,18 @@ class LogFile:
         self.who.extend(logfile.who)
         self.who = list(set(self.who))
         self.who.sort()
+        self.work_set = self.logs
 
-    def filter_ckeys(self, *ckeys: str):
+    def filter_ckeys(self, *ckeys: str) -> None:
         """Removes all logs in which the specified ckeys are not present, saving the result in self.work_set. Works much like Notepad++,
-        but only counts the agent (actor). See filter_strings for a function like Notepad++ bookmark"""
+        but only counts the agent (actor, the one who performed the action). See `filter_strings` for a function like Notepad++ bookmark
+        
+        Parameters:
+        `ckeys` (tuple[str, ...]): ckeys to filter
+
+        Example call: `my_log.filter_ckeys("ckey1", "ckey2")` (as many or little ckeys as you want)
+        
+        Returns `None`"""
         filtered = []
         for log in self.work_set:
             if log.agent and log.agent.ckey in ckeys:
@@ -129,15 +145,17 @@ class LogFile:
             return
         self.work_set = filtered
 
-    def filter_strings(self, *strings: str):
+    def filter_strings(self, *strings: str) -> None:
         """Removes all logs in which the specified strings are not present, saving them in `self.work_set`. Works exactly like Notepad++ bookmark
         
         Parameters:
-        strings (tuple[str, ...]): strings to filter
+        `strings` (tuple[str, ...]): strings to filter
+
+        Example calls: `my_log.filter_strings("Hi!")`, `my_log.filter_strings("attacked", "injected", "I hate you")` (as many strings as you want)
         
-        Returns None"""
+        Returns `None`"""
         filtered = []
-        for log in self.logs:
+        for log in self.work_set:
             for string in strings:
                 if string in log.raw_line:
                     filtered.append(log)
@@ -151,16 +169,20 @@ class LogFile:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha) and stores the remaining lines in `self.work_set`
         
         Parameters:
-        ckey (str): desired ckey
+        `ckey` (str): desired ckey
+
+        Example call: `my_log.filter_heard("ckey")`
         
-        Returns None"""
+        Returns `None`"""
         self.work_set = self.get_only_heard(ckey)
 
-    def filter_conversation(self, *ckeys: str): # TODO: hide lines not in conversation
+    def filter_conversation(self, *ckeys: str) -> None: # TODO: hide lines not in conversation
         """Tries to get a conversation between multiple parties, excluding what they would and would not hear. Only accounts for local say (for now). Saves the result in `self.work_set`
         
         Parameters:
-        ckeys (tuple[str, ...]): ckeys to use for sorting
+        `ckeys` (tuple[str, ...]): ckeys to use for sorting
+
+        Example call: `my_log.filter_conversation("ckey1", "ckey2", "ckey3")` (as many or little ckeys as you want)
         
         Returns None"""
         self.filter_ckeys(*ckeys)
@@ -176,18 +198,22 @@ class LogFile:
         self.work_set = final
 
     def reset_work_set(self):
-        """Removes all filters; sets the working set to be equal to all logs"""
+        """Removes all filters; sets the working set to be equal to all logs
+        
+        Example call: my_log.reset_work_set()"""
         self.work_set = self.logs
 
-    def get_only_heard(self, ckey: str, logs_we_care_about: list[LogType] = None) -> list[Log]:
+    def get_only_heard(self, ckey: str, logs_we_care_about: Union[list[LogType], Literal["ALL"]] = "ALL") -> list[Log]:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha). Uses logs from `self.work_set`
 
         Parameters:
-        ckey (str): ckeys to use
+        `ckey` (str): ckeys to use
+        `logs_we_care_about` (list[LogType])
+
+        Example calls: `my_log.get_only_heard("ckey")`, `my_log.get_only_heard("ckey", "ALL")`, `my_log.get_only_heard("ckey", [LogType.SAY, LogType.WHISPER])`
         
-        Returns list[Log]"""
+        Returns `list[Log]`"""
         self.sort()
-        if not logs_we_care_about: logs_we_care_about = [LogType.ATTACK, LogType.EMOTE, LogType.WHISPER, LogType.SAY, LogType.PDA]
         walking_error = 4
         # Adjust for error created by lack of logs
         hearing_range = HEARING_RANGE + walking_error
@@ -209,7 +235,7 @@ class LogFile:
             if not cur_loc[2] == last_loc[2]: 
                 continue
             # Filter logs that we don't care about but still use their location
-            if not log.log_type in logs_we_care_about:
+            if logs_we_care_about and (logs_we_care_about != "ALL" or not log.log_type in logs_we_care_about):
                 continue
 
             # Calculate distance
@@ -218,6 +244,47 @@ class LogFile:
                 filtered.append(log)
 
         return filtered
+
+    def filter_by_location_name(self, location_name: str) -> None:
+        """Removes all logs that did not happen in the specified location,
+        and stores the result in the work set.
+        
+        Parameters:
+        `location_name` (str): the name of the location, case insensitive
+
+        Example call: my_log.filter_by_location_name("Bar")
+        
+        Returns `None`"""
+        filtered = []
+        for log in self.work_set:
+            if location_name.lower() == log.location_name.lower():
+                filtered.append(log)
+        if not filtered:
+            print("Operation completed with empty set. Aborting.")
+            return
+        self.work_set = filtered
+
+    def filter_by_radius(self, location: tuple[int, int, int], radius: int) -> None:
+        """Removes all logs that did not happen in the specified radius around the location,
+        and stores the result in the work set.
+        
+        Parameters:
+        location (tuple[int, int, int]): the location
+        radius (int): the radius
+
+        Example call: `my_log.filter_by_radius((32, 41, 2), 5)`
+        
+        Returns None"""
+        filtered = []
+        for log in self.work_set:
+            # Z level must match
+            if log.location[2] != location[2]: continue
+            if abs(location[0] - log.location[0]) - radius < 0 and abs(location[1] - log.location[1]) - radius < 0:
+                filtered.append(log)
+        if not filtered:
+            print("Operation completed with empty set. Aborting.")
+            return
+        self.work_set = filtered
 
     def print_working(self) -> None:
         """Prints working set to the console"""
@@ -232,6 +299,8 @@ class LogFile:
         
         Parameters:
         filename (str): name of the file to write to (overwrites everything)
+
+        Example call: `my_log.write_working_to_file("logs.txt")`
         
         Returns None"""
         with open(filename, "w") as f:
@@ -244,7 +313,11 @@ class LogFile:
         
         Parameters:
         filename (str): name (and location) of the desired file
-        type (LogFileType): type of the log (can be left out)
+        type (LogFileType): type of the log (optional, defaults to LogFileType.UNKNOWN)
+        verbose (bool): toggle verbose mode (False by default)
+        quiet (bool): toggle quiet mode (False by default)
+
+        Example call: `my_log = LogFile.from_file("game.txt")`
         
         Returns LogFile"""
         if filename.endswith(".html"): UnsupportedLogTypeException(f"{filename} does not seem to be supported")
@@ -253,8 +326,17 @@ class LogFile:
         return LogFile(lines, type, verbose, quiet)
 
     @staticmethod
-    def from_folder(folder: str, verbose: bool = False, quiet: bool = False):
-        """Parses all log files in a folder"""
+    def from_folder(folder: str, verbose: bool = False, quiet: bool = False) -> LogFile:
+        """Parses all log files in a folder, combining them into a single file
+        
+        Parameters:
+        `filename` (str): name (and location) of the desired folder
+        `verbose` (bool): toggle verbose mode (False by default)
+        `quiet` (bool): toggle quiet mode (False by default)
+
+        Example call: `my_log = LogFile.from_file("game.txt")`
+        
+        Returns `LogFile`"""
         if not os.path.isdir(folder): raise Exception("Is not a folder")
         folder = folder.replace("\\", "/")
         if folder[-1] != "/": folder += "/"
@@ -274,8 +356,14 @@ class LogFile:
         `https://tgstation13.org/parsed-logs/{server}/data/logs/{year}/{month}/{day}/round-{round_id}/`,
         but with actual values inserted.
 
-        `logs_we_care_about` is a list of strings, containing the file names. For example: `["game.txt", "attack.txt"]`
-        """
+        Parameters:
+        `logs_we_care_about` (list[str]): list of strings, containing the file names. For example: `["game.txt", "attack.txt"]`.This defaults to all supported files.
+        `verbose` (bool): toggle verbose mode (False by default)
+        `quiet` (bool): toggle quiet mode (False by default)
+
+        Example call: `my_log = LogFile.from_logs_link("link here")`
+
+        Returns `LogFile`"""
         import requests as req
         # Should be all supported log types as a default. Don't forget to update this list! (you will)
         if not logs_we_care_about: logs_we_care_about = ["game.txt", "attack.txt", "pda.txt", "silicon.txt", "mecha.txt", "virus.txt"]
