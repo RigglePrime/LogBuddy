@@ -312,7 +312,7 @@ class Log:
         pda_type, other = other.strip(" (").split(" to ", 1)
         patient, other = other.split(') "', 1)
         self.patient = Player(None, patient)
-        text, location = other.split('" (')
+        text, location = other.split('" (', 1)
         self.text = pda_type + " " + html_unescape(text.strip())
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start].strip()
