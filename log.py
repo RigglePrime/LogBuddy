@@ -203,7 +203,7 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         text, other = other.split('" ', 1)
-        self.text = html_unescape(text)
+        self.text = html_unescape(text.strip('"'))
         other, location = other.split('(', 1)
         other = other.strip()
         if other:
