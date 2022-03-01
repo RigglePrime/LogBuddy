@@ -17,6 +17,7 @@ class LogType(Enum):
     EMOTE = 7
     ATTACK = 8
     VOTE = 9
+    SILICON = 10
 
     @staticmethod
     def parse_log_type(string: str):
@@ -24,6 +25,11 @@ class LogType(Enum):
             return LogType[string.upper()]
         except:
             return LogType.UNKNOWN
+
+class SiliconLogType(Enum):
+    MISC = 0
+    CYBORG = 1
+    LAW = 2
     
 class Player:
     ckey: Optional[str]
@@ -86,6 +92,9 @@ class Log:
     text: Annotated[Optional[str], "Any remaining unparsed text"] = None
     is_dead: Annotated[Optional[bool], "Is the agent dead?"] = None
 
+    # Silicon specific
+    silicon_log_type: Annotated[SiliconLogType, "If log type is silicon, it will represent the subtype, otherwise None"] = None
+
     def parse_game(self, log: str) -> None:
         """Parses a game log entry from `GAME:` onwards (GAME: should not be included)"""
         self.text = log
@@ -127,8 +136,24 @@ class Log:
         #    print(other) # TODO: fix this part
         self.action = other
 
+    def parse_silicon(self, log: str) -> None:
+        """Parses a game log entry from `SILICON:` onwards (SILICON: should not be included)"""
+        if log.startswith("CYBORG: "):
+            self.silicon_log_type = SiliconLogType.CYBORG
+            log = log[8:]
+        elif log.startswith("LAW: "):
+            self.silicon_log_type = SiliconLogType.LAW
+            log = log[5:]
+        else:
+            self.silicon_log_type = SiliconLogType.MISC
+        agent, other = log.split(") ", 1)
+        self.agent = Player.parse_player(agent)
+        # TODO: finish writing a very annoying parse function
+
     def parse_and_set_location(self, log: str) -> int:
-        """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line."""
+        """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
+        
+        Returns the position of the location in the string"""
         # Find all possible location strings
         r = re.findall("\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
@@ -166,4 +191,5 @@ class Log:
         """Object representation"""
         return self.raw_line
 
-if __name__ == "__main__": print("This file is a module and is not meant to be run")
+if __name__ == "__main__":
+    print(Log(input()))
