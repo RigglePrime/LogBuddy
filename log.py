@@ -24,6 +24,7 @@ class LogType(Enum):
     PDA = 13
     MECHA = 14
     PAPER = 15
+    VIRUS = 16
 
     @staticmethod
     def parse_log_type(string: str):
@@ -126,6 +127,9 @@ class Log:
 
     # Silicon specific
     silicon_log_type: Annotated[SiliconLogType, "If log type is silicon, it will represent the subtype, otherwise None"] = None
+
+    # Virus specific
+    virus_name: Annotated[SiliconLogType, "If log type is virus, it will store the virus name"]
 
     def parse_game(self, log: str) -> None:
         """Parses a game log entry from `GAME:` onwards (GAME: should not be included)"""
@@ -330,6 +334,23 @@ class Log:
         agent, other = log.split(") ", 1)
         self.agent = Player.parse_player(agent)
         self.text = other.strip()
+
+    def parse_virus(self, log: str) -> None:
+        """Parses a game log entry from `VIRUS:` onwards (VIRUS: should not be included)"""
+        if log.startswith("A culture bottle was printed for the virus"):
+            agent = log.split(") by ", 1)[1]
+            self.agent = Player.parse_player(agent)
+            self.virus_name, other = log.split("A culture bottle was printed for the virus ")[1].split(" sym:", 1)
+            self.text = "printed, sym:" + other.strip()
+        else:
+            agent, other = log.split(" was infected by virus: ") 
+            self.agent = Player.parse_player(agent)
+            virus_name, other = other.split(" sym:")
+            self.virus_name = virus_name
+            self.text = "infected, sym:" + other.strip()
+        # Location is available in both cases
+        loc_start = self.parse_and_set_location(log)
+        self.location_name = log[:loc_start].split("(")[-1].strip()
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
