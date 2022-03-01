@@ -82,15 +82,15 @@ class Log:
         f = getattr(self, f"parse_{self.log_type.name.lower()}", None)
         if f: f(other)
 
-    time: Annotated[datetime, "Time of logging"] = None
-    agent: Annotated[Optional[Player], "Player performing the action"] = None
-    patient: Annotated[Optional[Player], "Player receiving the action"] = None
-    raw_line: Annotated[str, "Raw, unmodified line"] = None
-    log_type: Annotated[LogType, "Type of the log"] = None
-    location: Annotated[Optional[Tuple[int,int,int]], "X, Y, Y where the action was performed"] = None
-    location_name: Annotated[Optional[str], "Name of the location where the action was performed"] = None
-    text: Annotated[Optional[str], "Any remaining unparsed text"] = None
-    is_dead: Annotated[Optional[bool], "Is the agent dead?"] = None
+    time: Annotated[datetime, "Time of logging"]
+    agent: Annotated[Optional[Player], "Player performing the action"]
+    patient: Annotated[Optional[Player], "Player receiving the action"]
+    raw_line: Annotated[str, "Raw, unmodified line"]
+    log_type: Annotated[LogType, "Type of the log"]
+    location: Annotated[Optional[Tuple[int,int,int]], "X, Y, Y where the action was performed"]
+    location_name: Annotated[Optional[str], "Name of the location where the action was performed"]
+    text: Annotated[Optional[str], "Any remaining unparsed text"]
+    is_dead: Annotated[Optional[bool], "Is the agent dead?"]
 
     # Silicon specific
     silicon_log_type: Annotated[SiliconLogType, "If log type is silicon, it will represent the subtype, otherwise None"] = None
@@ -103,19 +103,19 @@ class Log:
         """Parses a game log entry from `ACCESS:` onwards (ACCESS: should not be included)"""
         self.text = log
 
-    def parse_admin(self, log: str):
+    def parse_admin(self, log: str) -> None:
         """Parses a game log entry from `ADMIN:` onwards (ADMIN: should not be included)"""
         self.text = log
 
-    def parse_ooc(self, log: str):
+    def parse_ooc(self, log: str) -> None:
         """Parses a game log entry from `OOC:` onwards (OOC: should not be included)"""
         self.generic_say_parse(log)
 
-    def parse_say(self, log: str):
+    def parse_say(self, log: str) -> None:
         """Parses a game log entry from `SAY:` onwards (SAY: should not be included)"""
         self.generic_say_parse(log)
 
-    def parse_whisper(self, log: str):
+    def parse_whisper(self, log: str) -> None:
         """Parses a game log entry from `WHISPER:` onwards (WHISPER: should not be included)"""
         self.generic_say_parse(log)
 
@@ -153,7 +153,7 @@ class Log:
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
         
-        Returns the position of the location in the string"""
+        Returns the position of the location in the string as in integer"""
         # Find all possible location strings
         r = re.findall("\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
