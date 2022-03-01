@@ -48,10 +48,21 @@ To load just one file, use `my_log = LogFile.from_file("game.txt")` (assuming yo
 You can later add another file by doing `another_log = LogFile.from_file("attack.txt")`. To combine them use
 `my_log.collate(another_log)`. This will modify `my_log` to incorporate the other log object's logs.
 
+The variable name completely depends on you, you can pick any name you want (usually all lowercase with
+underscores instead of spaces). Just don't forget to replace `my_log` with your name.
+
+When loading logs you may see some errors. It's usually fine to ignore them, unless there's many of them.
+Sometimes there are strange and uncommon ways to log things, and it's hard to account for all of them.
+
 If you have a public logs website (see: [this link](https://tgstation13.org/parsed-logs/)), you can use
 `my_log = LogFile.from_logs_link("link_to_root_of_files")`. You know you have the right link when you see
 many different log files displayed. An example of the full link is can be seen
 [here](https://tgstation13.org/parsed-logs/terry/data/logs/2022/03/01/round-179256/).
+
+Before getting started you may want to see some stats. To see the amount of log lines loaded, run
+`len(my_log.logs)` (or `main_file` if you're using the default variable). To see the list of all
+players that connected during that round, you can run `my_log.who`, or `len(my_log.who)` for the
+number of players that have connected.
 
 Now that we have a log file ready, let's filter it. We want to find out if someone has really been running
 around and destroying windows. Firstly, let's filter out only their ckey like so
