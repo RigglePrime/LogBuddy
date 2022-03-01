@@ -55,7 +55,7 @@ class LogFile:
 
         for line in logs:
             try:
-                line = line.strip("\n").strip()
+                line = line.strip("\r\n ")
                 if line.startswith("-censored"): continue # Skip censored lines
                 # VOTE is split into multiple lines, so account for that
                 if line.startswith("- <b>") and self.logs and self.logs[-1].log_type == LogType.VOTE:
