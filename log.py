@@ -184,6 +184,7 @@ class Log:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
         
         Returns the position of the location in the string as in integer"""
+        # NOTE: this does not set location name, as it is not always present
         # Find all possible location strings
         r = re.findall("\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
