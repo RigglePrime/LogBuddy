@@ -229,8 +229,7 @@ class Log:
             # "has hit", # I don't think this is ever used against players, so I'll leave it out
             "has kicks" # Another typo... feel free to fix for free GBP since we already have "kicked"
         )):
-            print(other)
-            other_temp = other.split(" ", 2)[2]
+            other_temp = other.split(" ", 2)[2].replace("(CQC) ", "")
             parse_key = True
         # Splashed has a special case :)))
         elif other.startswith("has splashed"):
@@ -240,8 +239,8 @@ class Log:
         # Three words
         elif other.startswith((
             "has fired at",
-            "started fireman carrying",
-            "was fireman carried by",
+            #"started fireman carrying", # Doesn't have a ckey, just a mob name
+            #"was fireman carried by", # Doesn't have a ckey, just a mob name
             "has operated on",
             "has stun attacked",
             # "has pulled from", # Annoying to implement, so I won't
