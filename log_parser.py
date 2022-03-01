@@ -178,7 +178,7 @@ class LogFile:
         
         Returns list[Log]"""
         self.sort()
-        if not logs_we_care_about: logs_we_care_about = [LogType.ATTACK, LogType.EMOTE, LogType.WHISPER, LogType.SAY]
+        if not logs_we_care_about: logs_we_care_about = [LogType.ATTACK, LogType.EMOTE, LogType.WHISPER, LogType.SAY, LogType.PDA]
         walking_error = 4
         # Adjust for error created by lack of logs
         hearing_range = HEARING_RANGE + walking_error
