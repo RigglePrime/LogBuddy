@@ -159,7 +159,7 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         if not " (" in other:
-            self.text = other
+            self.text = other.strip()
             return
         action, location = other.split(' (', 1)
         self.text = action
@@ -312,7 +312,7 @@ class Log:
         patient, other = other.split(') "', 1)
         self.patient = Player(None, patient)
         text, location = other.split('" (')
-        self.text = pda_type + " " + html_unescape(text)
+        self.text = pda_type + " " + html_unescape(text.strip())
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start].strip()
 
