@@ -256,7 +256,7 @@ class LogFile:
         if folder[-1] != "/": folder += "/"
         log_collection = LogFile()
         for file in os.listdir(folder):
-            if verbose: print("Parsing", file)
+            print("Parsing", file)
             try:
                 log_collection.collate(LogFile.from_file(folder + file, verbose=verbose))
             except UnsupportedLogTypeException:
