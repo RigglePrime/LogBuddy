@@ -127,7 +127,7 @@ class Log:
     new_hp: Annotated[float, "If the log type is attack, the new hp info will be stored here"]
 
     # Silicon specific
-    silicon_log_type: Annotated[SiliconLogType, "If log type is silicon, it will represent the subtype, otherwise None"] = None
+    silicon_log_type: Annotated[SiliconLogType, "If log type is silicon, it will represent the subtype, otherwise None"]
 
     # Virus specific
     virus_name: Annotated[SiliconLogType, "If log type is virus, it will store the virus name"]
