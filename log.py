@@ -148,7 +148,13 @@ class Log:
             self.silicon_log_type = SiliconLogType.MISC
         agent, other = log.split(") ", 1)
         self.agent = Player.parse_player(agent)
-        # TODO: finish writing a very annoying parse function
+
+        if self.silicon_log_type == SiliconLogType.LAW and other.startswith("used "):
+            agent = other.split(" on ", 1)[1].split(") ")[0]
+            self.agent = Player.parse_player(agent)
+        self.text = other
+        # NOTE: someone PLEASE fix logging this is getting ridiculous
+        # NOTE: there is no reliable way of getting the second key here
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
