@@ -30,6 +30,21 @@ class LogType(Enum):
         except:
             return LogType.UNKNOWN
 
+class DamageType(Enum):
+    UNKNOWN = 0
+    BRUTE = 1
+    BURN = 2
+    TOXIN = 3
+    OXYGEN = 4
+    CELLULAR = 5
+
+    @staticmethod
+    def parse_damage_type(string: str):
+        try:
+            return DamageType[string.upper()]
+        except:
+            return DamageType.UNKNOWN
+
 class SiliconLogType(Enum):
     MISC = 0
     CYBORG = 1
@@ -102,6 +117,11 @@ class Log:
     text: Annotated[Optional[str], "Any remaining unparsed text"]
     is_dead: Annotated[Optional[bool], "Is the agent dead?"]
 
+    # Attack specific
+    combat_mode: Annotated[bool, "This variable will store if the combat mode was on or off (only applies to attack logs)"]
+    damage_type: Annotated[DamageType, "If the log type is attack, the damage type will be stored here"]
+    new_hp: Annotated[float, "If the log type is attack, the new hp info will be stored here"]
+
     # Silicon specific
     silicon_log_type: Annotated[SiliconLogType, "If log type is silicon, it will represent the subtype, otherwise None"] = None
 
@@ -154,9 +174,111 @@ class Log:
         """Parses a game log entry from `ATTACK:` onwards (ATTACK: should not be included)"""
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
-        #if "/" in other:
-        #    print(other) # TODO: fix this part
-        self.action = other
+        loc_start = self.parse_and_set_location(other)
+        if loc_start > 0:
+            self.location_name = other[:loc_start].split("(")[-1].strip()
+            other = other[:loc_start].replace(self.location_name, "").strip(" (")
+        # Combat mode regex
+        r = re.search("\(COMBAT MODE: (\d)\)", other)
+        if r: 
+            self.combat_mode = bool(int(r.group(1)))
+            other = other.replace(r.group(0), "")
+        # Damage type regex
+        r = re.search("\(DAMTYPE: (\w+)\)", other)
+        if r: 
+            self.damage_type = DamageType.parse_damage_type(r.group(1))
+            other = other.replace(r.group(0), "")
+        # New HP regex
+        r = re.search("\(NEWHP: (-?\d+\.?\d?)\)", other)
+        if r: 
+            self.new_hp = float(r.group(1))
+            other = other.replace(r.group(0), "")
+        
+        # NOTE: There is no better way of doing this. Why? Because the ckey isn't a ckey, it's a key WHICH COULD
+        # CONTAIN SPACES AND IT'S IMPOSSIBLE TO TELL WHAT IS PART OF THE KEY AND WHAT ISN'T. I love SS13 logs.
+        parse_key = False
+        other_temp = None
+        # One word
+        if other.startswith("injected"):
+            other_temp = other.split(" ", 1)[1]
+            parse_key = True
+        # NOTE: Performance? Not sure if it helps go check yourself, I am too lazy
+        elif not other.startswith(("has", "was", "is", "started")): 
+            # I love the logs. I love spaghetti.
+            if "is being stripped of" in other or \
+                    "has been stripped of" in other or \
+                    "is being pickpocketed of" in other or \
+                    "is having the" in other:
+                patient = other.split(") ", 1)[0]
+                self.patient = Player.parse_player(patient)
+            pass # This stops the if chain from executing further
+        # A large tuple... there is no better way, I thought for a long time
+        # If you think of a better way, please PR it or make an issue report
+
+        # Two words
+        elif other.startswith((
+            "has shot", "has sprayed", "has attacked", "has grabbed",
+            "has shaken", "has bolted", "has unbolted", "has fed",
+            "has kicked", "has flashed", "was flashed", "has tabled",
+            "has shoved", "has pushed", "has healed", "has injected",
+            "has punched", "has revived", "has applied", "has CPRed",
+            "has handcuffed", "has crushed", "has tackled", "has electrocuted",
+            "has attached", "has strangled", "has cremated", "has zapped",
+            "has implanted", "has stung", "has augmented", "has bopped", "has stuffed",
+            "has places", # Do NOT fix this typo, I will have to add another damn startswith
+            # "has hit", # I don't think this is ever used against players, so I'll leave it out
+            "has kicks" # Another typo... feel free to fix for free GBP since we already have "kicked"
+        )):
+            other_temp = other.split(" ", 1)[2]
+            parse_key = True
+        # Splashed has a special case :)))
+        elif other.startswith("has splashed"):
+            other_temp = other.replace("(thrown) ", "")
+            other_temp = other_temp.split(" ", 1)[2]
+            parse_key = True
+        # Three words
+        elif other.startswith((
+            "has fired at",
+            "started fireman carrying",
+            "was fireman carried by",
+            "has operated on",
+            "has stun attacked",
+            # "has pulled from", # Annoying to implement, so I won't
+            "has restrained (CQC)",
+            "has CQCs (CQC)", # Many typos were discovered today
+            "has disarmed (CQC)",
+            "has resisted grab",
+            "has broke grab",
+            "has head slammed"
+        )):
+            other_temp = other.split(" ", 1)[3]
+            parse_key = True
+        # Four words
+        elif other.startswith("has") and other.startswith((
+            "has attempted to inject",
+            "has attempted to punch",
+            "has attempted to strangle",
+            "has been shot by", # NOTE: shot by can have an empty value. I love SS13 logs
+            "has threw and hit",
+            "has attempted to handcuff",
+            "has attempted to apply",
+            "has failed to handcuff"
+        )):
+            other_temp = other.split(" ", 1)[4]
+            parse_key = True
+        # Five words
+        elif other.startswith(("has tended to the wounds", "has attempted to neck grab", "has overloaded the heart of")):
+            other_temp = other.split(" ", 1)[5]
+            parse_key = True
+
+        if parse_key:
+            patient = other_temp.split(") ")[0]
+            self.patient = Player.parse_player(patient)
+            del other_temp
+        # NOTE: surgery related logs were not added, as they are quite rare and I don't think they'd contribute much. Feel free
+        # to add them yourself. (example: "has surgically removed")
+        # On another note, `attached a the saline-glucose solution bottle to the`
+        self.text = other.strip()
 
     def parse_vote(self, log: str) -> None:
         """Parses a game log entry from `VOTE:` onwards (VOTE: should not be included)"""
