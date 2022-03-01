@@ -13,6 +13,7 @@ HEARING_RANGE = 9
 
 class NotSortableException(Exception): pass
 class InvalidType(Exception): pass
+class UnsupportedLogTypeException(Exception): pass
 
 class LogFileType(Enum):
     UNKNOWN = 0
@@ -238,6 +239,7 @@ class LogFile:
         type (LogFileType): type of the log (can be left out)
         
         Returns LogFile"""
+        if filename.endswith(".html"): UnsupportedLogTypeException(f"{filename} does not seem to be supported")
         with open(filename, "r") as f:
             lines = f.readlines()
         return LogFile(lines, type, verbose)
@@ -251,7 +253,11 @@ class LogFile:
         log_collection = LogFile()
         for file in os.listdir(folder):
             if verbose: print("Parsing", file)
-            log_collection.collate(LogFile.from_file(folder + file, verbose=verbose))
+            try:
+                log_collection.collate(LogFile.from_file(folder + file, verbose=verbose))
+            except UnsupportedLogTypeException:
+                print(f"{file} isn't supported, skipping")
+                continue
         return log_collection
 
     @staticmethod
