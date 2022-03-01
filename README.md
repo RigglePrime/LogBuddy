@@ -19,6 +19,7 @@ LogBuddy is a helper tool for reading log files. It has features to:
 - paper.txt
 - mecha.txt
 - telecomms.txt
+- uplink.txt
 
 ## How it works
 

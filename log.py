@@ -26,6 +26,7 @@ class LogType(Enum):
     PAPER = 15
     VIRUS = 16
     TCOMMS = 17
+    UPLINK = 18
 
     @staticmethod
     def parse_log_type(string: str):
@@ -376,6 +377,13 @@ class Log:
         language, location = other.split(") (", 1)
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start].strip()
+
+    def parse_uplink(self, log: str) -> None:
+        """Parses a game log entry from `UPLINK:` onwards (UPLINK: should not be included)"""
+        agent, other = log.split(" [", 1)
+        self.agent = Player.parse_player(agent)
+        self.text = html_unescape(other.strip())
+        # Maybe in the future I could add a telecrystals variable, but I don't see a need
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
