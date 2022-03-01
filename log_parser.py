@@ -57,6 +57,10 @@ class LogFile:
             try:
                 line = line.strip("\n").strip()
                 if line.startswith("-censored"): continue # Skip censored lines
+                # VOTE is split into multiple lines, so account for that
+                if line.startswith("- <b>") and self.logs and self.logs[-1].log_type == LogType.VOTE:
+                    self.logs[-1].text += ", " + line.replace("- <b>", "").replace("</b>", "")
+                    continue
                 log = Log(line)
                 self.logs.append(log)
                 if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who: self.who.append(log.agent.ckey.replace("[DC]",""))

@@ -152,6 +152,10 @@ class Log:
         #    print(other) # TODO: fix this part
         self.action = other
 
+    def parse_vote(self, log: str) -> None:
+        """Parses a game log entry from `VOTE:` onwards (VOTE: should not be included)"""
+        self.text = log.replace("<b>", "").replace("</b>", "").strip()
+
     def parse_silicon(self, log: str) -> None:
         """Parses a game log entry from `SILICON:` onwards (SILICON: should not be included)"""
         if log.startswith("CYBORG: "):
