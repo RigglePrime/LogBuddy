@@ -64,13 +64,14 @@ Before getting started you may want to see some stats. To see the amount of log 
 players that connected during that round, you can run `my_log.who`, or `len(my_log.who)` for the
 number of players that have connected.
 
-Now that we have a log file ready, let's filter it. We want to find out if someone has really been running
+Now that we have a log file ready, let's filter it. We want to find out if someone has been running
 around and destroying windows. Firstly, let's filter out only their ckey like so
-`my_log.filter_ckeys("WindowSmasher32")`. We can view the result by calling `my_log.print_working()`.
-We're not done yet, we can go further than this. Let's filter out everything (in the result), that
-doesn't contain a window. To do this, we can call `my_log.filter_strings("window")`. This works a lot
-like CTRL + F. To write our result to a file, we can use `my_log.write_working_to_file("logs.txt")`,
-which will write our working set to `logs.txt`.
+`my_log.filter_ckeys("WindowSmasher32")` (sidenote: notice the s in ckeys. This means you can filter
+for multiple: `my_log.filter_ckeys("WindowSmasher32", "FireaxeLover2", "CoolCkey53")`. We can view
+the result by calling `my_log.print_working()`. We're not done yet, we can go further than this. Let's
+filter out everything (in the result), that doesn't contain a window. To do this, we can call
+`my_log.filter_strings("window")`. This works a lot like CTRL + F. To write our result to a file, we
+can use `my_log.write_working_to_file("logs.txt")`, which will write our working set to `logs.txt`.
 
 But why not just use a text editor for this? Here's why. Let's say someone's been lying, and you want to
 know if they heard someone say something. You could either go searching by hand, or call
