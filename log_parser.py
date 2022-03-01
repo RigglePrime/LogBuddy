@@ -169,15 +169,15 @@ class LogFile:
         """Removes all filters; sets the working set to be equal to all logs"""
         self.work_set = self.logs
 
-    def get_only_heard(self, ckey: str) -> list[Log]:
+    def get_only_heard(self, ckey: str, logs_we_care_about: list[LogType] = None) -> list[Log]:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha). Uses logs from `self.work_set`
 
         Parameters:
-        ckeys (tuple[str, ...]): ckeys to use for sorting
+        ckey (str): ckeys to use
         
         Returns list[Log]"""
         self.sort()
-        logs_we_care_about = [LogType.ATTACK, LogType.EMOTE, LogType.WHISPER, LogType.SAY]
+        if not logs_we_care_about: logs_we_care_about = [LogType.ATTACK, LogType.EMOTE, LogType.WHISPER, LogType.SAY]
         walking_error = 4
         # Adjust for error created by lack of logs
         hearing_range = HEARING_RANGE + walking_error
@@ -185,15 +185,16 @@ class LogFile:
         cur_loc = (0, 0, 0)
         last_loc = cur_loc
         for log in self.work_set:
-            # Check if location exists, if not skip
-            if not log.location:
-                continue
-            # Check for ckey, update location
-            if log.agent and ckey == log.agent.ckey: 
-                last_loc = cur_loc
-                cur_loc = log.location
+            # Check for ckey. If our target was included in the action we can safely assume they saw it
+            if (log.agent and ckey == log.agent.ckey) or (log.patient and ckey == log.patient.ckey): 
+                # If there's a location attached, update it
+                if log.location:
+                    last_loc = cur_loc
+                    cur_loc = log.location
                 filtered.append(log)
                 continue
+            # If our target didn't participate, we need to check how far away it happened
+
             # Check z-level, if they differ save location and continue
             if not cur_loc[2] == last_loc[2]: 
                 continue
