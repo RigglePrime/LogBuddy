@@ -427,6 +427,10 @@ class Log:
         """Parses a generic SAY log entry from SAY: onwards (includes SAY, WHISPER, OOC) (should only include line from SAY: onwards, without the SAY)"""
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
+        # Priority announcements, yet another exception
+        if other.startswith(("(priority announcement)", "(message to the other server)")):
+            self.text = html_unescape(other.strip())
+            return
         text, other = other.split('" ', 1)
         self.text = html_unescape(text.strip('"'))
         other, location = other.split('(', 1)
