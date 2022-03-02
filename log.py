@@ -331,7 +331,8 @@ class Log:
         agent, other = log.split(") ", 1)
         self.agent = Player.parse_player(agent)
         pda_type, other = other.strip(" (").split(" to ", 1)
-        patient, other = other.split(') "', 1)
+        # Sending a message with the message monitor console adds a "sent " FOR NO PARTICULAR REASON
+        patient, other = other.replace('sent "', '"').split(') "', 1)
         self.patient = Player(None, patient)
         text, location = other.split('" (', 1)
         self.text = html_unescape(text.strip())
