@@ -31,6 +31,7 @@ def variables(cls: object) -> dict[str, Any]:
 
 
 if __name__ == "__main__":
+    print("LogBuddy starting...")
     import argparse
     parser = argparse.ArgumentParser(description='Parses-the-logs')
 
