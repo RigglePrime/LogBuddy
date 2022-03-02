@@ -107,6 +107,7 @@ class Log:
         self.raw_line = line
         dt, other = self.raw_line.split("] ", 1)
         self.time = isoparse(dt[1:]) # Remove starting [
+        if other.endswith("VOTE:"): other += " "
         log_type, other = other.split(": ", 1)
         self.log_type = LogType.parse_log_type(log_type)
         # Python go brrrrrrr
