@@ -65,7 +65,7 @@ class LogFile:
                 if line.startswith("-censored"): continue # Skip censored lines
                 # VOTE is split into multiple lines, so account for that
                 if line.startswith("- <b>") and self.logs and self.logs[-1].log_type == LogType.VOTE:
-                    self.logs[-1].text += ", " + line.replace("- <b>", "").replace("</b>", "")
+                    self.logs[-1].text += ", " + html_unescape(line.replace("- <b>", "").replace("</b>", ""))
                     continue
                 # Priority announcements (and others like it) sometimes do this
                 elif line.startswith("- ") and self.logs and self.logs[-1].log_type == LogType.SAY:
