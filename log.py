@@ -343,9 +343,13 @@ class Log:
         else:
             pda_type, other = other.strip(" (").split(" to ", 1)
             patient, other = other.split(') "', 1)
-            text, location = other.split('" (', 1)
-            loc_start = self.parse_and_set_location(location)
-            self.location_name = location[:loc_start].strip()
+            # If this happens, it's probably a multiline PDA message... and if not? Another exception to add to the list...
+            if not '"' in other: 
+                text = other
+            else:
+                text, location = other.split('" (', 1)
+                loc_start = self.parse_and_set_location(location)
+                self.location_name = location[:loc_start].strip()
         self.patient = Player(None, patient)
         self.text = html_unescape(text.strip())
 
@@ -439,11 +443,11 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         # Priority announcements, yet another exception
-        if other.startswith(("(priority announcement)", "(message to the other server)")):
+        if other.startswith(("(priority announcement)", "(message to the other server)")) and not '" ' in other:
             self.text = html_unescape(other.strip())
             return
         text, other = other.split('" ', 1)
-        self.text = html_unescape(text.strip('"'))
+        self.text = html_unescape(text.strip('"').replace('"', '| '))
         other, location = other.split('(', 1)
         other = other.strip()
         if other:

@@ -68,9 +68,11 @@ class LogFile:
                     self.logs[-1].text += ", " + html_unescape(line.replace("- <b>", "").replace("</b>", ""))
                     continue
                 # Priority announcements (and others like it) sometimes do this
-                elif line.startswith("- ") and self.logs and self.logs[-1].log_type == LogType.SAY:
+                elif line.startswith("- ") and self.logs and (self.logs[-1].log_type == LogType.SAY or LogType.PDA):
                     # Don't actually insert a new line
-                    self.logs[-1].text += "\\n" + html_unescape(line.replace("- ", ""))
+                    line = self.logs[-1].raw_line + "\\n" + line.replace("- ", "")
+                    # Remove the incomplete entry (so we can parse location too!)
+                    self.logs.pop()
                 log = Log(line)
                 self.logs.append(log)
                 if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who: self.who.append(log.agent.ckey.replace("[DC]",""))
