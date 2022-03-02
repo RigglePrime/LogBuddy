@@ -184,8 +184,17 @@ class Log:
 
     def parse_attack(self, log: str) -> None:
         """Parses a game log entry from `ATTACK:` onwards (ATTACK: should not be included)"""
-        agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
-        self.agent = Player.parse_player(agent)
+        if ") " in log:
+            agent, other = log.split(") ", 1)
+            self.agent = Player.parse_player(agent)
+        elif "] " in log:
+            agent, other = log.split("] ", 1)
+            # Remove [, since the name usually looks like "[frag grenade] has ..."
+            self.agent = Player(None, agent[1:])
+        else:
+            # Just in case there's some strange log entry
+            return
+
         loc_start = self.parse_and_set_location(other)
         if loc_start > 0:
             self.location_name = other[:loc_start].split("(")[-1].strip()
