@@ -330,14 +330,23 @@ class Log:
         """Parses a game log entry from `PDA:` onwards (PDA: should not be included)"""
         agent, other = log.split(") ", 1)
         self.agent = Player.parse_player(agent)
-        pda_type, other = other.strip(" (").split(" to ", 1)
         # Sending a message with the message monitor console adds a "sent " FOR NO PARTICULAR REASON
-        patient, other = other.replace('sent "', '"').split(') "', 1)
+        # It gets better... it also moves " to "...
+        if "PDA: message monitor console" in other:
+            pda_type, other = other.split(') sent "')
+            text, other = other.split('" to ', 1)
+            loc_start = self.parse_and_set_location(other)
+            self.location_name = other[:loc_start].split("(")[-1].strip()
+            # -1 for a space that we stripped, and an extra 1 for the bracket
+            patient = other[:loc_start - len(self.location_name) - 2].strip()
+        else:
+            pda_type, other = other.strip(" (").split(" to ", 1)
+            patient, other = other.split(') "', 1)
+            text, location = other.split('" (', 1)
+            loc_start = self.parse_and_set_location(location)
+            self.location_name = location[:loc_start].strip()
         self.patient = Player(None, patient)
-        text, location = other.split('" (', 1)
         self.text = html_unescape(text.strip())
-        loc_start = self.parse_and_set_location(location)
-        self.location_name = location[:loc_start].strip()
 
     def parse_mecha(self, log: str) -> None:
         """Parses a game log entry from `MECHA:` onwards (MECHA: should not be included)"""
