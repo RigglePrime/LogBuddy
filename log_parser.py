@@ -58,6 +58,7 @@ class LogFile:
             logs = logs[2:]
 
         for line in logs:
+            if not line: continue
             try:
                 line = line.strip("\r\n ")
                 if line.startswith("-censored"): continue # Skip censored lines
