@@ -376,6 +376,7 @@ class LogFile:
         if not link[-1] == "/": link += "/"
         log_collection = LogFile()
         for log_file in logs_we_care_about:
+            if not quiet: print(f"Retrieving {log_file}")
             r = req.get(link + str(log_file))
             if not r.ok:
                 if not quiet: print(f"Error {r.status_code} while retrieving {log_file}")
