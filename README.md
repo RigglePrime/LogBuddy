@@ -84,7 +84,9 @@ write a custom sort function, the world's your oyster!
 
 ## Running
 
-To run:
+Download [this executable](https://github.com/RigglePrime/LogBuddy/releases/latest) OR
+
+Using Python:
 
 - `pip install -r requirements.txt`
 - `python LogBuddy.py`
