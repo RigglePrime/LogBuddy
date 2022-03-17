@@ -243,7 +243,9 @@ class LogFile:
             if not cur_loc[2] == last_loc[2]: 
                 continue
             # Filter logs that we don't care about but still use their location
-            if logs_we_care_about and (logs_we_care_about != "ALL" or not log.log_type in logs_we_care_about):
+            if logs_we_care_about and (logs_we_care_about != "ALL"):
+                continue
+            if type(logs_we_care_about) == list and not log.log_type in logs_we_care_about:
                 continue
 
             # Calculate distance
