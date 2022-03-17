@@ -10,6 +10,8 @@ from log_parser import LogFile
 # Change the help text, so users can more easily understand what to do
 from _sitebuiltins import _Helper
 _Helper.__repr__ = lambda self: """Welcome to LogBuddy!
+Use right click to copy something, CTRL + C will terminate the program.
+
 To get started, type "LogFile.from_file('game.txt')" (if there is a file named game.txt in the same directory) or "LogFile.from_folder('logs')" (if your game.txt, attack.txt... are stored in a folder named logs)
 
 Type help(Log) for information about the log, and help(LogFile) for information about log files.
