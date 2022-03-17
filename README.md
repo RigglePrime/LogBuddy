@@ -1,5 +1,11 @@
 # LogBuddy
 
+- [LogBuddy](#logbuddy)
+  - [Currently supported log files](#currently-supported-log-files)
+  - [How it works](#how-it-works)
+  - [Example](#example)
+  - [Running](#running)
+
 This tool is "actively" being developed! Make sure to check for updates from time to time, they might add a cool feature!
 
 LogBuddy is a helper tool for reading log files. It has features to:
@@ -87,6 +93,12 @@ write a custom sort function, the world's your oyster!
 ## Running
 
 Download [this executable](https://github.com/RigglePrime/LogBuddy/releases/latest) OR
+
+Quick tip: the colours on your terminal might not look that great, especially if you're using Windows.
+I strongly suggest running it with Windows Terminal, as it has MUCH nicer colours. Simply download it
+(I'm sure you can figure out how to do that), open the Terminal (try right clicking near the executable,
+you may get an option to "open in Windows Terminal", if not use "`cd <directory>`, or `cd ..` to go back),
+and run the executable from there (type the name out).
 
 Using Python:
 
