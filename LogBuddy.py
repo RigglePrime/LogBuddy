@@ -57,6 +57,7 @@ if __name__ == "__main__":
                 if args.verbose: print("Parsing", file)
                 main_file.collate(LogFile.from_file(file, verbose=args.verbose, quiet=args.quiet))
 
+    help = _Helper() # When you bundle everything with pyinstaller, help stops working for some reason
     from IPython import embed
     embed(header="""
 _                ______           _     _       
