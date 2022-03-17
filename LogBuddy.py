@@ -75,4 +75,4 @@ Switching to interactive
 
 Press tab to autocomplete
 For LogBuddy specific help type 'help' or '?' for IPython's help (without the quotes).
-""", local=locals(), colors="Neutral")
+""", colors="Neutral")
