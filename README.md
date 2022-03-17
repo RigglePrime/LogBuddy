@@ -1,5 +1,7 @@
 # LogBuddy
 
+This tool is "actively" being developed! Make sure to check for updates from time to time, they might add a cool feature!
+
 LogBuddy is a helper tool for reading log files. It has features to:
 
 - combine multiple log files
