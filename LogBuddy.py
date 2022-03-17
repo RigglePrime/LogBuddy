@@ -2,6 +2,7 @@
 import inspect
 import os
 from typing import Any
+from colorama import Fore, Back, init as colorama_init
 
 # Log is unused, but it's here so the user doesn't have to import it manually
 from log import Log
@@ -9,19 +10,22 @@ from log_parser import LogFile
 
 # Change the help text, so users can more easily understand what to do
 from _sitebuiltins import _Helper
-_Helper.__repr__ = lambda self: """Welcome to LogBuddy!
-Use right click to copy something, CTRL + C will terminate the program.
+_Helper.__repr__ = lambda self: f"""Welcome to {Fore.CYAN}LogBuddy{Fore.RESET}!
+{Fore.YELLOW}Use right click to copy something, CTRL + C will terminate the program.{Fore.RESET}
 
-To get started, type "LogFile.from_file('game.txt')" (if there is a file named game.txt in the same directory) or "LogFile.from_folder('logs')" (if your game.txt, attack.txt... are stored in a folder named logs)
+Please see the latest documentation at {Fore.BLUE}https://github.com/RigglePrime/LogBuddy/blob/master/README.md{Fore.RESET}
+To get started, type '{Fore.GREEN}LogFile.from_file("game.txt"){Fore.RESET}' (if there is a file named game.txt in the same directory) or '{Fore.GREEN}LogFile.from_folder("logs"){Fore.RESET}' (if your game.txt, attack.txt... are stored in a folder named logs)
 
-Type help(Log) for information about the log, and help(LogFile) for information about log files.
-Type functions(object) for a list of all defined functions and variables(object) for a list of all variables. Both are currently quite bad (I will get to it some day I promise).
+Type '{Fore.GREEN}help(Log){Fore.RESET}' for information about the log, and '{Fore.GREEN}help(LogFile){Fore.RESET}' for information about log files.
+Type '{Fore.GREEN}functions(object){Fore.RESET}' for a list of all defined functions and '{Fore.GREEN}variables(object){Fore.RESET}' for a list of all variables. Both are currently quite bad (I will get to it some day I promise).
 
-LogBuddy performs all operations on an internal work set, so you can chain filters (functions). To reset the work set, call reset_work_set on your log instance.
+{Fore.CYAN}LogBuddy{Fore.RESET} performs all operations on an internal work set, so you can chain filters (functions). To reset the work set, call '{Fore.GREEN}reset_work_set(){Fore.RESET}' on your log instance.
 
-If -- More -- is displayed on the bottom of the screen, press enter to advance one line, space to advance a screen or q to quit.
+If {Fore.YELLOW}-- More --{Fore.RESET} is displayed on the bottom of the screen, press {Fore.YELLOW}return (enter){Fore.RESET} to advance one line, {Fore.YELLOW}space{Fore.RESET} to advance a screen or {Fore.YELLOW}q{Fore.RESET} to quit.
+IPython (the thing you type in that displays 'In [2]:') will sometimes suggest commands. The gray part can be inserted by simply pressing {Fore.YELLOW}→{Fore.RESET}. Clear the current line by pressing {Fore.YELLOW}CTRL + C{Fore.RESET}.
+You can exit by typing '{Fore.GREEN}exit{Fore.RESET}' or pressing {Fore.YELLOW}CTRL + D{Fore.RESET}.
 
-For Python's interactive help, type help(), or help(object) for help about object."""
+For Python's interactive help, type '{Fore.GREEN}help(){Fore.RESET}', or '{Fore.GREEN}help(object){Fore.RESET}' for help about object (for example: '{Fore.GREEN}help(LogFile){Fore.RESET}')."""
 
 def functions(cls: object) -> list[tuple[str, Any]]:
     """Returns all methods of an object"""
@@ -60,8 +64,9 @@ if __name__ == "__main__":
     del args
 
     help = _Helper() # When you bundle everything with pyinstaller, help stops working for some reason
+    colorama_init()
     from IPython import embed
-    embed(header="""
+    embed(header=f"""{Fore.CYAN}
 _                ______           _     _       
 | |               | ___ \         | |   | |      
 | |     ___   __ _| |_/ /_   _  __| | __| |_   _ 
@@ -70,9 +75,9 @@ _                ______           _     _
 \_____/\___/ \__, \____/ \__,_|\__,_|\__,_|\__, |
             __/ |                         __/ |
             |___/                         |___/ 
-            
+            {Fore.RESET}
 Switching to interactive
 
 Press tab to autocomplete
-For LogBuddy specific help type 'help' or '?' for IPython's help (without the quotes).
+For {Fore.CYAN}LogBuddy{Fore.RESET} specific help type '{Fore.GREEN}help{Fore.RESET}' or '{Fore.GREEN}?{Fore.RESET}' for IPython's help (without the quotes).
 """, colors="Neutral")
