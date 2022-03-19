@@ -52,7 +52,7 @@ as you'd like. The list of supported files is just above.
 
 As an alternative you can use
 `my_log = LogFile.from_logs_line("https://tgstation13.org/parsed-logs/terry/data/logs/2022/03/18/round-180150/")`
-(the number is the round ID). This will automatically download all available log files.
+(the link should be replaced with your own). This will automatically download all available log files.
 
 To load the whole folder (and save the result to a variable), we use `my_log = LogFile.from_folder("logs")`.
 If your logs folder is somewhere else, just type out the whole absolute or relative paths (for example, `../logs/`).
