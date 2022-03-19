@@ -45,10 +45,14 @@ on the executable).
 At any point feel free to type `help` for general help, or `help(thing)` for help with that specific
 thing (for example `help(LogFile)`).
 
-First, we download our logs to a folder. Let's name the folder `logs`. The folder will be in the same
-parent folder as the executable (or script), so we don't have as much to type. For this example feel free
-to download as many (or just one!) supported log files as you'd like. The list of supported files is just
-above.
+First, we download (there is an easier alternative, keep reading) our logs to a folder. Let's name the
+folder `logs`. The folder will be in the same parent folder as the executable (or script), so we don't
+have as much to type. For this example feel free to download as many (or just one!) supported log files
+as you'd like. The list of supported files is just above.
+
+As an alternative you can use
+`my_log = LogFile.from_logs_line("https://tgstation13.org/parsed-logs/terry/data/logs/2022/03/18/round-180150/")`
+(the number is the round ID). This will automatically download all available log files.
 
 To load the whole folder (and save the result to a variable), we use `my_log = LogFile.from_folder("logs")`.
 If your logs folder is somewhere else, just type out the whole absolute or relative paths (for example, `../logs/`).
