@@ -42,6 +42,7 @@ class LogFile:
     work_set: Annotated[list[Log], "Stores a list of filtered logs"]
     who: Annotated[list[str], "Stores a list of all connected ckeys"]
     sortable: bool
+    log_source: Annotated[str, "Source of the logs (if available)"]
 
     def __init__(self, logs: list[str] = [], type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> None:
         if verbose and quiet:
@@ -324,6 +325,8 @@ class LogFile:
                 f.write(str(log) + "\n")
             from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
             f.write(f"Created using LogBuddy v{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH} https://github.com/RigglePrime/LogBuddy\n")
+            if self.log_source:
+                f.write(f"Logs acquired from {self.log_source}")
 
     @staticmethod
     def from_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> LogFile:
@@ -394,6 +397,7 @@ class LogFile:
                 if not quiet: print(f"Error {r.status_code} while retrieving {log_file}")
                 continue
             log_collection.collate(LogFile(r.text.replace("\r", "").split("\n"), verbose=verbose, quiet=quiet))
+        log_collection.log_source = link
         return log_collection
 
 if __name__ == "__main__":
