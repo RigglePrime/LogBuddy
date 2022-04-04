@@ -282,8 +282,8 @@ class LogFile:
         and stores the result in the work set.
         
         Parameters:
-        location (tuple[int, int, int]): the location
-        radius (int): the radius
+        `location` (tuple[int, int, int]): the location
+        `radius` (int): the radius
 
         Example call: `my_log.filter_by_radius((32, 41, 2), 5)`
         
@@ -315,7 +315,7 @@ class LogFile:
         """Writes current `self.work_set` to the desired file.
         
         Parameters:
-        filename (str): name of the file to write to (overwrites everything)
+        `filename` (str): name of the file to write to (overwrites everything)
 
         Example call: `my_log.write_working_to_file("logs.txt")`
         
@@ -333,10 +333,10 @@ class LogFile:
         """Parses the specified log file
         
         Parameters:
-        filename (str): name (and location) of the desired file
-        type (LogFileType): type of the log (optional, defaults to LogFileType.UNKNOWN)
-        verbose (bool): toggle verbose mode (False by default)
-        quiet (bool): toggle quiet mode (False by default)
+        `filename` (str): name (and location) of the desired file
+        `type` (LogFileType): type of the log (optional, defaults to LogFileType.UNKNOWN)
+        `verbose` (bool): toggle verbose mode (False by default)
+        `quiet` (bool): toggle quiet mode (False by default)
 
         Example call: `my_log = LogFile.from_file("game.txt")`
         
