@@ -7,6 +7,7 @@ from colorama import Fore, Back, init as colorama_init
 # Log is unused, but it's here so the user doesn't have to import it manually
 from log import Log
 from log_parser import LogFile
+from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
 
 # Change the help text, so users can more easily understand what to do
 from _sitebuiltins import _Helper
@@ -43,7 +44,7 @@ if __name__ == "__main__":
 
     parser.add_argument("-v", "--verbose", action="store_true", help="Toggle verbose mode")
     parser.add_argument("-q", "--quiet", "--silent", action="store_true", help="Toggle silent mode")
-    parser.add_argument("--version", action="version", version="LogBuddy v1.2.0")
+    parser.add_argument("--version", action="version", version=f"LogBuddy v{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH}")
     parser.add_argument("file", nargs="*", help="One or multiple log files or a single folder containing log files to parse")
     args = parser.parse_args()
 

@@ -322,7 +322,8 @@ class LogFile:
         with open(filename, "w") as f:
             for log in self.work_set:
                 f.write(str(log) + "\n")
-            f.write("Created using LogBuddy https://github.com/RigglePrime/LogBuddy\n")
+            from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
+            f.write(f"Created using LogBuddy v{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH} https://github.com/RigglePrime/LogBuddy\n")
 
     @staticmethod
     def from_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> LogFile:
