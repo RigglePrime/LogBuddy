@@ -65,8 +65,15 @@ if __name__ == "__main__":
 
     help = _Helper() # When you bundle everything with pyinstaller, help stops working for some reason
     colorama_init()
+
+    # Hand pick random startup colours
+    from random import choice
+    colour = choice([Fore.BLUE, Fore.CYAN, Fore.GREEN, Fore.LIGHTBLUE_EX, Fore.LIGHTCYAN_EX,
+            Fore.LIGHTGREEN_EX, Fore.LIGHTMAGENTA_EX, Fore.LIGHTRED_EX, Fore.LIGHTWHITE_EX,
+            Fore.LIGHTYELLOW_EX, Fore.MAGENTA, Fore.RED, Fore.WHITE, Fore.YELLOW])
+
     from IPython import embed
-    embed(header=f"""{Fore.CYAN}
+    embed(header=f"""{colour}
 _                ______           _     _       
 | |               | ___ \         | |   | |      
 | |     ___   __ _| |_/ /_   _  __| | __| |_   _ 
