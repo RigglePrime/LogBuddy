@@ -83,11 +83,13 @@ class LogFile:
         self.unfiltered_logs.sort(key=lambda l:l.time)
         self.logs = self.unfiltered_logs
 
-    def add_log(self, log: Log) -> None:
-        """Appends a log entry to the end. This will not sort the logs or reset the current workset.
+    def add_log(self, log: Log, reset_workset: bool = True, sort: bool = True) -> None:
+        """Appends a log entry to the end.
         
         Parameters:
         `log` (Log): the Log object to be added
+        `reset_workset` (bool): if we should also reset the working set
+        `sort` (bool): if we should also sort the logs afterwards
 
         NOTE: the log variable MUST be of type Log
 
@@ -95,16 +97,26 @@ class LogFile:
         """
         if not isinstance(log, Log): raise InvalidType(f"Type Log required but type {str(type(log))} was found")
         self.unfiltered_logs.append(log)
+        if reset_workset:
+            self.reset_work_set()
+        if sort:
+            self.sort()
 
-    def add_logs(self, logs: list[Log]) -> None:
-        """Appends a list of log entries to the end. This will not sort the logs or reset the current workset.
+    def add_logs(self, logs: list[Log], reset_workset: bool = True, sort: bool = True) -> None:
+        """Appends a list of log entries to the end.
         
         Parameters:
         logs (list[Log]): the Log objects list to be added
+        `reset_workset` (bool): if we should also reset the working set
+        `sort` (bool): if we should also sort the logs afterwards
 
         Returns None
         """
         self.unfiltered_logs.extend(logs)
+        if reset_workset:
+            self.reset_work_set()
+        if sort:
+            self.sort()
 
     def sort(self) -> None:
         """Sorts the current work set, using the time at which the log was added, descending
