@@ -38,8 +38,8 @@ class LogFile:
     `log_file = LogFile(["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
     """
     round_id: Annotated[int, "Stores the round ID. If unknown, it will equal -1"]
-    logs: Annotated[list[Log], "Stores a list of all logs"]
-    work_set: Annotated[list[Log], "Stores a list of filtered logs"]
+    unfiltered_logs: Annotated[list[Log], "Stores a list of all logs"]
+    logs: Annotated[list[Log], "Stores a list of filtered logs"]
     who: Annotated[list[str], "Stores a list of all connected ckeys"]
     sortable: bool
     log_source: Annotated[str, "Source of the logs (if available)"]
@@ -48,8 +48,8 @@ class LogFile:
         if verbose and quiet:
             print("Really? You want me to be silent and verbose? Those are mutually exclusive you know")
         self.round_id = -1
-        self.logs = [] # Python is dumb. I hate Python
-        self.work_set = []
+        self.unfiltered_logs = []
+        self.logs = []
         self.who = []
         self.sortable = True
         self.log_type = type
@@ -65,23 +65,23 @@ class LogFile:
                 line = line.strip("\r\n ")
                 if line.startswith("-censored"): continue # Skip censored lines
                 # VOTE is split into multiple lines, so account for that
-                if line.startswith("- <b>") and self.logs and self.logs[-1].log_type == LogType.VOTE:
-                    self.logs[-1].text += ", " + html_unescape(line.replace("- <b>", "").replace("</b>", ""))
+                if line.startswith("- <b>") and self.unfiltered_logs and self.unfiltered_logs[-1].log_type == LogType.VOTE:
+                    self.unfiltered_logs[-1].text += ", " + html_unescape(line.replace("- <b>", "").replace("</b>", ""))
                     continue
                 # Priority announcements (and others like it) sometimes do this
-                elif line.startswith("- ") and self.logs:
+                elif line.startswith("- ") and self.unfiltered_logs:
                     # Don't actually insert a new line
-                    line = self.logs[-1].raw_line + "\\n" + line.replace("- ", "")
+                    line = self.unfiltered_logs[-1].raw_line + "\\n" + line.replace("- ", "")
                     # Remove the incomplete entry (so we can parse location too!)
-                    self.logs.pop()
+                    self.unfiltered_logs.pop()
                 log = Log(line)
-                self.logs.append(log)
+                self.unfiltered_logs.append(log)
                 if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who: self.who.append(log.agent.ckey.replace("[DC]",""))
             except Exception as e:
                 if not quiet: print(f"Could not be parsed: '{line}', with the reason:", e)
                 if verbose: traceback.print_exc()
-        self.logs.sort(key=lambda l:l.time)
-        self.work_set = self.logs
+        self.unfiltered_logs.sort(key=lambda l:l.time)
+        self.logs = self.unfiltered_logs
 
     def add_log(self, log: Log) -> None:
         """Appends a log entry to the end. This will not sort the logs or reset the current workset.
@@ -94,7 +94,7 @@ class LogFile:
         Returns None
         """
         if not isinstance(log, Log): raise InvalidType(f"Type Log required but type {str(type(log))} was found")
-        self.logs.append(log)
+        self.unfiltered_logs.append(log)
 
     def add_logs(self, logs: list[Log]) -> None:
         """Appends a list of log entries to the end. This will not sort the logs or reset the current workset.
@@ -104,7 +104,7 @@ class LogFile:
 
         Returns None
         """
-        self.logs.extend(logs)
+        self.unfiltered_logs.extend(logs)
 
     def sort(self) -> None:
         """Sorts the current work set, using the time at which the log was added, descending
@@ -113,7 +113,7 @@ class LogFile:
         
         Returns None"""
         if not self.sortable: raise NotSortableException("Not enough information to sort the logs")
-        self.work_set.sort(key=lambda l:l.time)
+        self.logs.sort(key=lambda l:l.time)
 
     def collate(self, logfile: LogFile) -> None:
         """Collates (extends, adds together) two LogFile objects and changes the LogFileType to COLLATED.
@@ -127,13 +127,13 @@ class LogFile:
 
         Returns `None`
         """
-        self.add_logs(logfile.logs)
+        self.add_logs(logfile.unfiltered_logs)
         self.log_type = LogFileType.COLLATED
-        self.logs.sort(key=lambda l:l.time)
+        self.unfiltered_logs.sort(key=lambda l:l.time)
         self.who.extend(logfile.who)
         self.who = list(set(self.who))
         self.who.sort()
-        self.work_set = self.logs
+        self.logs = self.unfiltered_logs
 
     def filter_ckeys(self, *ckeys: str) -> None:
         """Removes all logs in which the specified ckeys are not present, saving the result in self.work_set. Works much like Notepad++,
@@ -146,13 +146,13 @@ class LogFile:
         
         Returns `None`"""
         filtered = []
-        for log in self.work_set:
+        for log in self.logs:
             if log.agent and log.agent.ckey in ckeys:
                 filtered.append(log)
         if not filtered:
             print("Operation completed with empty set. Aborting.")
             return
-        self.work_set = filtered
+        self.logs = filtered
 
     def filter_strings(self, *strings: str) -> None:
         """Removes all logs in which the specified strings are not present, saving them in `self.work_set`. Works exactly like Notepad++ bookmark
@@ -164,7 +164,7 @@ class LogFile:
         
         Returns `None`"""
         filtered = []
-        for log in self.work_set:
+        for log in self.logs:
             for string in strings:
                 if string in log.raw_line:
                     filtered.append(log)
@@ -172,7 +172,7 @@ class LogFile:
         if not filtered:
             print("Operation completed with empty set. Aborting.")
             return
-        self.work_set = filtered
+        self.logs = filtered
 
     def filter_heard(self, ckey: str) -> None:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha) and stores the remaining lines in `self.work_set`
@@ -183,7 +183,7 @@ class LogFile:
         Example call: `my_log.filter_heard("ckey")`
         
         Returns `None`"""
-        self.work_set = self.get_only_heard(ckey)
+        self.logs = self.get_only_heard(ckey)
 
     def filter_conversation(self, *ckeys: str) -> None: # TODO: hide lines not in conversation
         """Tries to get a conversation between multiple parties, excluding what they would and would not hear. Only accounts for local say (for now). Saves the result in `self.work_set`
@@ -204,13 +204,13 @@ class LogFile:
             return
         final = list(set(final))
         final.sort(key=lambda l:l.time)
-        self.work_set = final
+        self.logs = final
 
     def reset_work_set(self):
         """Removes all filters; sets the working set to be equal to all logs
         
         Example call: my_log.reset_work_set()"""
-        self.work_set = self.logs
+        self.logs = self.unfiltered_logs
 
     def get_only_heard(self, ckey: str, logs_we_care_about: Union[list[LogType], Literal["ALL"]] = "ALL") -> list[Log]:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha). Uses logs from `self.work_set`
@@ -229,7 +229,7 @@ class LogFile:
         filtered = []
         cur_loc = (0, 0, 0)
         last_loc = cur_loc
-        for log in self.work_set:
+        for log in self.logs:
             # Check for ckey. If our target was included in the action we can safely assume they saw it
             if (log.agent and ckey == log.agent.ckey) or (log.patient and ckey == log.patient.ckey) or (log.text and f"{ckey}/(" in log.text): 
                 # If there's a location attached, update it
@@ -269,13 +269,13 @@ class LogFile:
         
         Returns `None`"""
         filtered = []
-        for log in self.work_set:
+        for log in self.logs:
             if location_name.lower() == log.location_name.lower():
                 filtered.append(log)
         if not filtered:
             print("Operation completed with empty set. Aborting.")
             return
-        self.work_set = filtered
+        self.logs = filtered
 
     def filter_by_radius(self, location: tuple[int, int, int], radius: int) -> None:
         """Removes all logs that did not happen in the specified radius around the location,
@@ -289,7 +289,7 @@ class LogFile:
         
         Returns None"""
         filtered = []
-        for log in self.work_set:
+        for log in self.logs:
             # Z level must match
             if log.location[2] != location[2]: continue
             if abs(location[0] - log.location[0]) - radius < 0 and abs(location[1] - log.location[1]) - radius < 0:
@@ -297,7 +297,7 @@ class LogFile:
         if not filtered:
             print("Operation completed with empty set. Aborting.")
             return
-        self.work_set = filtered
+        self.logs = filtered
 
     def print_working(self) -> None:
         """Prints working set to the console
@@ -305,10 +305,10 @@ class LogFile:
         Example call: `my_log.print_working()`
         
         Returns `None`"""
-        if not self.work_set:
+        if not self.logs:
             print("Working set empty")
             return
-        for log in self.work_set:
+        for log in self.logs:
             print(log.raw_line)
 
     def head(self, n: int = 10) -> None:
@@ -320,10 +320,10 @@ class LogFile:
         Example call: `my_log.head()`
 
         Returns `None`"""
-        if not self.work_set:
+        if not self.logs:
             print("Working set empty")
             return
-        for log in self.work_set[:n]:
+        for log in self.logs[:n]:
             print(log.raw_line)
 
     def tail(self, n: int = 10) -> None:
@@ -335,10 +335,10 @@ class LogFile:
         Example call: `my_log.tail()`
 
         Returns `None`"""
-        if not self.work_set:
+        if not self.logs:
             print("Working set empty")
             return
-        for log in self.work_set[-n:]:
+        for log in self.logs[-n:]:
             print(log.raw_line)
 
     def write_working_to_file(self, filename: str) -> None:
@@ -351,7 +351,7 @@ class LogFile:
         
         Returns None"""
         with open(filename, "w") as f:
-            for log in self.work_set:
+            for log in self.logs:
                 f.write(str(log) + "\n")
             from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
             f.write(f"Created using LogBuddy v{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH} https://github.com/RigglePrime/LogBuddy\n")
