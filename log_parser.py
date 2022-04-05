@@ -139,9 +139,8 @@ class LogFile:
 
         Returns `None`
         """
-        self.add_logs(logfile.unfiltered_logs)
+        self.add_logs(logfile.unfiltered_logs, sort=True)
         self.log_type = LogFileType.COLLATED
-        self.unfiltered_logs.sort(key=lambda l:l.time)
         self.who.extend(logfile.who)
         self.who = list(set(self.who))
         self.who.sort()
