@@ -108,6 +108,18 @@ class Log:
         dt, other = self.raw_line.split("] ", 1)
         self.time = isoparse(dt[1:]) # Remove starting [
         if other.endswith("VOTE:"): other += " "
+        if not ": " in other and (" in " in other or " (as " in other): # This means it's probably a TGUI log
+            # TGUI logs work the following way:
+            # If it's a mob, add "[mob.ckey] (as [mob] at [mob.x],[mob.y],[mob.z])"
+            # If it's a client, just add "[client.ckey]"
+            # Now it checks for context and window. If any of those are true, it
+            # appends " in [window]" (or context instead of window).
+            # You see, here's the problem. What if we only have a client and no window or context?
+            # Is that even possible? I am too lazy to make sure and will assume it's not. If it is, hi! Welcome to hell.
+            # Please edit the conditional before to work. Just know that it will catch false positives.
+            # What fun world of logging we live in. 
+            self.parse_tgui(other)
+            return
         log_type, other = other.split(": ", 1)
         self.log_type = LogType.parse_log_type(log_type)
         # Python go brrrrrrr
@@ -420,6 +432,37 @@ class Log:
         agent, other = log.split(") ", 1)
         self.agent = Player.parse_player(agent)
         self.text = html_unescape(other.strip())
+
+    def parse_tgui(self, log: str) -> None:
+        """Parses a TGUI log without the date""" # Send help, this is a mess
+        other = log
+
+        # Just in case because sometimes we have no ckey.
+        # I wonder if the logging code was made only to screw with people like me.
+        agent = "*no key*/(None)"
+
+        if " (as " in other:
+            key, other = other.split(" (as ", 1)
+            mob, other = other.split(" at ", 1)
+            location, other = other.split(")", 1)
+            
+            #Can't use parse_and_set_location because it's a snowflake log yet again! Fun.
+            self.location = tuple(int(x) for x in location.split(","))
+
+            agent = f"{key}/({mob})"
+
+        if " in " in other:
+            something, other = other.split(" in ", 1)
+            something = something.strip() # Just in case
+            if something:
+                # If the first branch ran, this should be empty. If it didn't then we have a ckey
+                # Logging is a giant mess
+                agent = f"{something}/(None)"
+        self.agent = Player.parse_player(agent)
+
+        # Set text to 'Empty' if other is empty, since we're expecting
+        # extra data (newlines will get appended)
+        self.text = other or "Empty" 
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
