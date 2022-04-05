@@ -18,10 +18,24 @@ class UnsupportedLogTypeException(Exception): pass
 
 class LogFileType(Enum):
     UNKNOWN = 0
-    GAME = 1
-    ATTACK = 2
-    COLLATED = 3
+    COLLATED = 1
+    GAME = 2
+    ATTACK = 3
+    PDA = 4
+    SILICON = 5
+    MECHA = 6
+    VIRUS = 7
+    TELECOMMS = 8
+    UPLINK = 9
+    SHUTTLE = 10
+    TGUI = 11
 
+    @staticmethod
+    def parse_log_file_type(string: str):
+        try:
+            return LogFileType[string.upper()]
+        except:
+            return LogFileType.UNKNOWN
 class LogFile:
     """An object representing a log file. Most functions use `self.work_set`, original logs sotred in `self.logs`.
 
@@ -370,12 +384,12 @@ class LogFile:
                 f.write(f"Logs acquired from {self.log_source}")
 
     @staticmethod
-    def from_file(filename: str, type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> LogFile:
+    def from_file(filename: str, log_type: LogFileType = None, verbose: bool = False, quiet: bool = False) -> LogFile:
         """Parses the specified log file
         
         Parameters:
         `filename` (str): name (and location) of the desired file
-        `type` (LogFileType): type of the log (optional, defaults to LogFileType.UNKNOWN)
+        `type` (LogFileType): type of the log. Use if you want to override log type detection (optional, defaults to LogFileType.UNKNOWN)
         `verbose` (bool): toggle verbose mode (False by default)
         `quiet` (bool): toggle quiet mode (False by default)
 
@@ -383,9 +397,11 @@ class LogFile:
         
         Returns LogFile"""
         if filename.endswith(".html"): UnsupportedLogTypeException(f"{filename} does not seem to be supported")
+        if not log_type and "." in filename:
+            log_type = LogFileType.parse_log_file_type(filename.split(".", 1))
         with open(filename, "r", encoding = "utf-8") as f:
             lines = f.readlines()
-        return LogFile(lines, type, verbose, quiet)
+        return LogFile(lines, log_type, verbose, quiet)
 
     @staticmethod
     def from_folder(folder: str, verbose: bool = False, quiet: bool = False) -> LogFile:
