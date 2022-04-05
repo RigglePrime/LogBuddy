@@ -142,7 +142,7 @@ class LogFile:
         self.add_logs(logfile.unfiltered_logs, sort=True)
         self.log_type = LogFileType.COLLATED
         self.who.extend(logfile.who)
-        self.who = list(set(self.who))
+        self.who = list(set(self.who)) # Remove duplicates
         self.who.sort()
         self.logs = self.unfiltered_logs
 
