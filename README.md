@@ -34,8 +34,8 @@ LogBuddy is a helper tool for reading log files. It has features to:
 
 When starting the application with parameters, a variable called `main_file` is created, which
 contains all lines from all log files provided, sorted by time. Any function called accesses and
-modifies the `work_set` variable of your `main_file`, so you may chain multiple functions.
-To reset the work set, call `main_file.reset_work_set()`.
+modifies the `logs` variable of your `main_file`, so you may chain multiple functions.
+To reset the work set and remove all filters, call `main_file.reset_work_set()`.
 
 ## Example
 
