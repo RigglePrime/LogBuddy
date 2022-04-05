@@ -311,6 +311,36 @@ class LogFile:
         for log in self.work_set:
             print(log.raw_line)
 
+    def head(self, n: int = 10) -> None:
+        """Prints the first few lines of the working set to the console.
+
+        Parameters:
+        `n` (int): number to print, defaults to 10
+
+        Example call: `my_log.head()`
+
+        Returns `None`"""
+        if not self.work_set:
+            print("Working set empty")
+            return
+        for log in self.work_set[:n]:
+            print(log.raw_line)
+
+    def tail(self, n: int = 10) -> None:
+        """Prints the last few lines of the working set to the console.
+
+        Parameters:
+        `n` (int): number to print, defaults to 10
+
+        Example call: `my_log.tail()`
+
+        Returns `None`"""
+        if not self.work_set:
+            print("Working set empty")
+            return
+        for log in self.work_set[-n:]:
+            print(log.raw_line)
+
     def write_working_to_file(self, filename: str) -> None:
         """Writes current `self.work_set` to the desired file.
         
