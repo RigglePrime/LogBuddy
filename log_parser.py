@@ -139,7 +139,7 @@ class LogFile:
     def sort(self) -> None:
         """Sorts the current work set, using the time at which the log was added, descending
         
-        Example call: `my_log.sort()`
+        Example call: `my_logs.sort()`
         
         Returns None"""
         if not self.sortable: raise NotSortableException("Not enough information to sort the logs")
@@ -153,7 +153,7 @@ class LogFile:
         Parameters:
         `logfile` (LogFile): the LogFile object you want to combine
 
-        Example: `my_log = LogFile()` `my_log.collate(LogFile.from_file("game.txt"))` `my_log.collate(LogFile.from_file("attack.txt"))`
+        Example: `my_logs = LogFile()` `my_logs.collate(LogFile.from_file("game.txt"))` `my_logs.collate(LogFile.from_file("attack.txt"))`
 
         Returns `None`
         """
@@ -171,7 +171,7 @@ class LogFile:
         Parameters:
         `ckeys` (tuple[str, ...]): ckeys to filter
 
-        Example call: `my_log.filter_ckeys("ckey1", "ckey2")` (as many or little ckeys as you want)
+        Example call: `my_logs.filter_ckeys("ckey1", "ckey2")` (as many or little ckeys as you want)
         
         Returns `None`"""
         filtered = []
@@ -190,7 +190,7 @@ class LogFile:
         `strings` (tuple[str, ...]): strings to filter
         `case_sensitive` (bool): toggles case sensitivity
 
-        Example calls: `my_log.filter_strings("Hi!")`, `my_log.filter_strings("attacked", "injected", "I hate you")`, `my_log.filter_strings("racial slur", case_sensitive=True)` (as many strings as you want)
+        Example calls: `my_logs.filter_strings("Hi!")`, `my_logs.filter_strings("attacked", "injected", "I hate you")`, `my_logs.filter_strings("racial slur", case_sensitive=True)` (as many strings as you want)
         
         Returns `None`"""
         filtered = []
@@ -220,7 +220,7 @@ class LogFile:
         `ckey` (str): desired ckey
         `walking_error` (int): added to hearing range to account for the lack of logs
 
-        Example call: `my_log.filter_heard("ckey")`
+        Example call: `my_logs.filter_heard("ckey")`
         
         Returns `None`"""
         self.logs = self.get_only_heard(ckey, walking_error = walking_error)
@@ -232,7 +232,7 @@ class LogFile:
         `ckeys` (tuple[str, ...]): ckeys to use for sorting
         `walking_error` (int): added to hearing range to account for the lack of logs
 
-        Example call: `my_log.filter_conversation("ckey1", "ckey2", "ckey3")` (as many or little ckeys as you want)
+        Example call: `my_logs.filter_conversation("ckey1", "ckey2", "ckey3")` (as many or little ckeys as you want)
         
         Returns None"""
         self.filter_ckeys(*ckeys)
@@ -250,7 +250,7 @@ class LogFile:
     def reset_work_set(self):
         """Removes all filters; sets the working set to be equal to all logs
         
-        Example call: my_log.reset_work_set()"""
+        Example call: my_logs.reset_work_set()"""
         self.logs = self.unfiltered_logs
 
     def get_only_heard(self, ckey: str, logs_we_care_about: Union[list[LogType], Literal["ALL"]] = "ALL", walking_error: int = 4) -> list[Log]:
@@ -261,7 +261,7 @@ class LogFile:
         `logs_we_care_about` (list[LogType])
         `walking_error` (int): added to hearing range to account for the lack of logs
 
-        Example calls: `my_log.get_only_heard("ckey")`, `my_log.get_only_heard("ckey", "ALL")`, `my_log.get_only_heard("ckey", [LogType.SAY, LogType.WHISPER])`
+        Example calls: `my_logs.get_only_heard("ckey")`, `my_logs.get_only_heard("ckey", "ALL")`, `my_logs.get_only_heard("ckey", [LogType.SAY, LogType.WHISPER])`
         
         Returns `list[Log]`"""
         self.sort()
@@ -306,7 +306,7 @@ class LogFile:
         Parameters:
         `location_name` (str): the name of the location, case insensitive
 
-        Example call: my_log.filter_by_location_name("Bar")
+        Example call: my_logs.filter_by_location_name("Bar")
         
         Returns `None`"""
         filtered = []
@@ -326,7 +326,7 @@ class LogFile:
         `location` (tuple[int, int, int]): the location
         `radius` (int): the radius
 
-        Example call: `my_log.filter_by_radius((32, 41, 2), 5)`
+        Example call: `my_logs.filter_by_radius((32, 41, 2), 5)`
         
         Returns None"""
         filtered = []
@@ -343,7 +343,7 @@ class LogFile:
     def print_working(self) -> None:
         """Prints working set to the console
         
-        Example call: `my_log.print_working()`
+        Example call: `my_logs.print_working()`
         
         Returns `None`"""
         if not self.logs:
@@ -358,7 +358,7 @@ class LogFile:
         Parameters:
         `n` (int): number to print, defaults to 10
 
-        Example call: `my_log.head()`
+        Example call: `my_logs.head()`
 
         Returns `None`"""
         if not self.logs:
@@ -373,7 +373,7 @@ class LogFile:
         Parameters:
         `n` (int): number to print, defaults to 10
 
-        Example call: `my_log.tail()`
+        Example call: `my_logs.tail()`
 
         Returns `None`"""
         if not self.logs:
@@ -388,7 +388,7 @@ class LogFile:
         Parameters:
         `filename` (str): name of the file to write to (overwrites everything)
 
-        Example call: `my_log.write_working_to_file("logs.txt")`
+        Example call: `my_logs.write_working_to_file("logs.txt")`
         
         Returns None"""
         with open(filename, "w", encoding = "utf-8") as f:
@@ -409,7 +409,7 @@ class LogFile:
         `verbose` (bool): toggle verbose mode (False by default)
         `quiet` (bool): toggle quiet mode (False by default)
 
-        Example call: `my_log = LogFile.from_file("game.txt")`
+        Example call: `my_logs = LogFile.from_file("game.txt")`
         
         Returns LogFile"""
         if filename.endswith(".html"): UnsupportedLogTypeException(f"{filename} does not seem to be supported")
@@ -428,7 +428,7 @@ class LogFile:
         `verbose` (bool): toggle verbose mode (False by default)
         `quiet` (bool): toggle quiet mode (False by default)
 
-        Example call: `my_log = LogFile.from_file("game.txt")`
+        Example call: `my_logs = LogFile.from_file("game.txt")`
         
         Returns `LogFile`"""
         if not os.path.isdir(folder): raise Exception("Is not a folder")
@@ -455,7 +455,7 @@ class LogFile:
         `verbose` (bool): toggle verbose mode (False by default)
         `quiet` (bool): toggle quiet mode (False by default)
 
-        Example call: `my_log = LogFile.from_logs_link("link here")`
+        Example call: `my_logs = LogFile.from_logs_link("link here")`
 
         Returns `LogFile`"""
         import requests as req
