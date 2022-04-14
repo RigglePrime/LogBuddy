@@ -375,7 +375,7 @@ class LogFile:
         Example call: `my_log.write_working_to_file("logs.txt")`
         
         Returns None"""
-        with open(filename, "w") as f:
+        with open(filename, "w", encoding = "utf-8") as f:
             for log in self.logs:
                 f.write(str(log) + "\n")
             from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
