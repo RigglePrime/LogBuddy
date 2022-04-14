@@ -183,19 +183,25 @@ class LogFile:
             return
         self.logs = filtered
 
-    def filter_strings(self, *strings: str) -> None:
+    def filter_strings(self, *strings: str, case_sensitive: bool = False) -> None:
         """Removes all logs in which the specified strings are not present, saving them in `self.work_set`. Works exactly like Notepad++ bookmark
         
         Parameters:
         `strings` (tuple[str, ...]): strings to filter
+        `case_sensitive` (bool): toggles case sensitivity
 
-        Example calls: `my_log.filter_strings("Hi!")`, `my_log.filter_strings("attacked", "injected", "I hate you")` (as many strings as you want)
+        Example calls: `my_log.filter_strings("Hi!")`, `my_log.filter_strings("attacked", "injected", "I hate you")`, `my_log.filter_strings("racial slur", case_sensitive=True)` (as many strings as you want)
         
         Returns `None`"""
         filtered = []
         for log in self.logs:
+            raw_line = log.raw_line
+            if not case_sensitive:
+                raw_line = raw_line.casefold()
             for string in strings:
-                if string in log.raw_line:
+                if not case_sensitive:
+                    string = string.casefold()
+                if string in raw_line:
                     filtered.append(log)
                 break
         if not filtered:
