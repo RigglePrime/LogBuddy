@@ -4,6 +4,7 @@
   - [Currently supported log files](#currently-supported-log-files)
   - [How it works](#how-it-works)
   - [Example](#example)
+  - [Cheat sheet](#cheat-sheet)
   - [Running](#running)
 
 This tool is "actively" being developed! Make sure to check for updates from time to time, they might add a cool feature!
@@ -93,6 +94,27 @@ To reduce our work set further, we can call the same functions as before.
 This is only the surface of what you can do. Python knowledge comes in handy here. Since this is a
 Python interpreter running in the background, you can do anything you would in Python. Run a file,
 write a custom sort function, the world's your oyster!
+
+## Cheat sheet
+
+- `my_log = LogFile.from_file("game.log")`: import game.log and save to `my_log`
+- `my_log = LogFile.from_folder("logs")`: open folder logs, import all log files and save to `my_log`
+- `my_log = LogFile.from_logs_link("https://tgstation13.org/parsed-logs/terry/data/logs/2022/03/01/round-179256/")`:
+open link, get all known files, parse them and save them to `my_log`
+- `my_log.filter_conversation("ckey1", "ckey2")`: get instances where ckey1 and ckey2 probably interacted
+- `my_log.filter_by_location_name("Pharmacy")`: only logs that happened in pharmacy
+- `my_log.filter_by_radius((32, 41, 2), 5)`: logs that happened 5 or less tiles away from (32, 41, 2)
+- `my_log.filter_ckeys("ckey1", "ckey2")`: actions that ckey2 or ckey2 performed (can be as many ckeys as you want)
+- `my_log.filter_heard("ckey")`: removes logs that ckey couldn't have heard or seen
+- `my_log.filter_strings("injected", "ckey1")`: works like CTRL+F but with multiple strings (as many as you want)
+- `my_log.filter_strings("injected", "ckey1", case_sensitive=True)`: same as above but case sensitive
+- `my_log.filter_strings_case_sensitive("injected", "ckey1")`: same as above
+- `my_log.reset_work_set()`: remove all filters
+- `my_log.head()` or `my_log.head(10)`: first 10 entries
+- `my_log.tail()` or `my_log.tail(10)`: last 10 entries
+- `my_log.sort()`: sorts the logs (usually called automatically, sorted by time)
+- `my_log.write_working_to_file("file.log")`: writes filtered logs to `file.log`
+- `my_log.print_working()`: prints all filtered logs
 
 ## Running
 
