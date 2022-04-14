@@ -209,6 +209,10 @@ class LogFile:
             return
         self.logs = filtered
 
+    def filter_strings_case_sensitive(self, *strings: str) -> None:
+        """Shorter for `filter_strings(*strings, case_sensitive = True)`"""
+        self.filter_strings(*strings, case_sensitive = True)
+
     def filter_heard(self, ckey: str) -> None:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha) and stores the remaining lines in `self.work_set`
         
