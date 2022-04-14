@@ -213,22 +213,24 @@ class LogFile:
         """Shorter for `filter_strings(*strings, case_sensitive = True)`"""
         self.filter_strings(*strings, case_sensitive = True)
 
-    def filter_heard(self, ckey: str) -> None:
+    def filter_heard(self, ckey: str, walking_error: int = 4) -> None:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha) and stores the remaining lines in `self.work_set`
         
         Parameters:
         `ckey` (str): desired ckey
+        `walking_error` (int): added to hearing range to account for the lack of logs
 
         Example call: `my_log.filter_heard("ckey")`
         
         Returns `None`"""
-        self.logs = self.get_only_heard(ckey)
+        self.logs = self.get_only_heard(ckey, walking_error = walking_error)
 
-    def filter_conversation(self, *ckeys: str) -> None: # TODO: hide lines not in conversation
+    def filter_conversation(self, *ckeys: str, walking_error: int = 4) -> None: # TODO: hide lines not in conversation
         """Tries to get a conversation between multiple parties, excluding what they would and would not hear. Only accounts for local say (for now). Saves the result in `self.work_set`
         
         Parameters:
         `ckeys` (tuple[str, ...]): ckeys to use for sorting
+        `walking_error` (int): added to hearing range to account for the lack of logs
 
         Example call: `my_log.filter_conversation("ckey1", "ckey2", "ckey3")` (as many or little ckeys as you want)
         
@@ -236,7 +238,7 @@ class LogFile:
         self.filter_ckeys(*ckeys)
         final = []
         for ckey in ckeys:
-            final.extend(self.get_only_heard(ckey))
+            final.extend(self.get_only_heard(ckey, walking_error = walking_error))
 
         if not final:
             print("Operation completed with empty set. Aborting.")
@@ -251,18 +253,18 @@ class LogFile:
         Example call: my_log.reset_work_set()"""
         self.logs = self.unfiltered_logs
 
-    def get_only_heard(self, ckey: str, logs_we_care_about: Union[list[LogType], Literal["ALL"]] = "ALL") -> list[Log]:
+    def get_only_heard(self, ckey: str, logs_we_care_about: Union[list[LogType], Literal["ALL"]] = "ALL", walking_error: int = 4) -> list[Log]:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha). Uses logs from `self.work_set`
 
         Parameters:
         `ckey` (str): ckeys to use
         `logs_we_care_about` (list[LogType])
+        `walking_error` (int): added to hearing range to account for the lack of logs
 
         Example calls: `my_log.get_only_heard("ckey")`, `my_log.get_only_heard("ckey", "ALL")`, `my_log.get_only_heard("ckey", [LogType.SAY, LogType.WHISPER])`
         
         Returns `list[Log]`"""
         self.sort()
-        walking_error = 4
         # Adjust for error created by lack of logs
         hearing_range = HEARING_RANGE + walking_error
         filtered = []
