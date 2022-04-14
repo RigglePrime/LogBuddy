@@ -97,6 +97,10 @@ class LogFile:
         self.unfiltered_logs.sort(key=lambda l:l.time)
         self.logs = self.unfiltered_logs
 
+    def __len__(self) -> int:
+        """Returns the length of the logs array"""
+        return self.logs.__len__()
+
     def add_log(self, log: Log, reset_workset: bool = True, sort: bool = True) -> None:
         """Appends a log entry to the end.
         
