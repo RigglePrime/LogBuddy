@@ -30,6 +30,10 @@ class LogType(Enum):
     SHUTTLE = 19
 
     @staticmethod
+    def list():
+        return [x for x in LogType]
+
+    @staticmethod
     def parse_log_type(string: str):
         try:
             return LogType[string.upper()]
