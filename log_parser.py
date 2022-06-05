@@ -289,7 +289,9 @@ class LogFile:
                 continue
             if type(logs_we_care_about) == list and not log.log_type in logs_we_care_about:
                 continue
-
+            # Skip logs with no location data available
+            if not log.location:
+                continue
             # Calculate distance
             #if sqrt(pow(cur_loc[0] - log.location[0], 2) + pow(cur_loc[1] - log.location[1], 2)) - hearing_range < 0:
             if abs(cur_loc[0] - log.location[0]) - hearing_range < 0 and abs(cur_loc[1] - log.location[1]) - hearing_range < 0:
