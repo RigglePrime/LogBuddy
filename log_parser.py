@@ -6,7 +6,7 @@ from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
 from math import sqrt, pow
-from typing import Annotated, Union, Literal
+from typing import Annotated, Iterable, Union, Literal
 import traceback
 from html import unescape as html_unescape
 
@@ -336,6 +336,31 @@ class LogFile:
             # Z level must match
             if log.location[2] != location[2]: continue
             if abs(location[0] - log.location[0]) - radius < 0 and abs(location[1] - log.location[1]) - radius < 0:
+                filtered.append(log)
+        if not filtered:
+            print("Operation completed with empty set. Aborting.")
+            return
+        self.logs = filtered
+
+    def filter_by_type(self, include: Iterable[LogType] = [], exclude: Iterable[LogType] = []):
+        """Only keeps (or removes) logs lines of the specified type.
+        
+        Parameters:
+        `include` (tuple[LogType]): log types to include
+        `exclude` (tuple[LogType]): log types to exclude
+        
+        If the same type is seen in include and exclude, it will be excluded.
+        To get a list of all available LogTypes call `LogType.list()`
+
+        Example calls:
+        `my_logs.filter_by_type((LogType.OOC))` (the first argument counts as include)
+        `my_logs.filter_by_type(include=(LogType.SAY))`
+        `my_logs.filter_by_type(exclude=(LogType.TCOMMS))`
+        """
+
+        filtered = []
+        for log in self.logs:
+            if (include and log.log_type in include) and log.log_type not in exclude:
                 filtered.append(log)
         if not filtered:
             print("Operation completed with empty set. Aborting.")
