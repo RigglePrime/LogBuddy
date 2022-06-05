@@ -36,6 +36,11 @@ class LogFileType(Enum):
             return LogFileType[string.upper()]
         except:
             return LogFileType.UNKNOWN
+
+    @staticmethod
+    def list():
+        return [x for x in LogFileType]
+
 class LogFile:
     """An object representing a log file. Most functions use `self.work_set`, original logs sotred in `self.logs`.
 
