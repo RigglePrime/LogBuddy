@@ -5,7 +5,7 @@ from typing import Any
 from colorama import Fore, Back, init as colorama_init
 
 # Log is unused, but it's here so the user doesn't have to import it manually
-from log import Log
+from log import Log, LogType
 from log_parser import LogFile
 from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
 
