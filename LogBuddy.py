@@ -28,9 +28,11 @@ You can exit by typing '{Fore.GREEN}exit{Fore.RESET}' or pressing {Fore.YELLOW}C
 
 For Python's interactive help, type '{Fore.GREEN}help(){Fore.RESET}', or '{Fore.GREEN}help(object){Fore.RESET}' for help about object (for example: '{Fore.GREEN}help(LogFile){Fore.RESET}')."""
 
+
 def functions(cls: object) -> list[tuple[str, Any]]:
     """Returns all methods of an object"""
     return inspect.getmembers(cls, predicate=inspect.ismethod)
+
 
 def variables(cls: object) -> dict[str, Any]:
     """Returns all variables of an object"""
@@ -70,8 +72,8 @@ if __name__ == "__main__":
     # Hand pick random startup colours
     from random import choice
     colour = choice([Fore.BLUE, Fore.CYAN, Fore.GREEN, Fore.LIGHTBLUE_EX, Fore.LIGHTCYAN_EX,
-            Fore.LIGHTGREEN_EX, Fore.LIGHTMAGENTA_EX, Fore.LIGHTRED_EX, Fore.LIGHTWHITE_EX,
-            Fore.LIGHTYELLOW_EX, Fore.MAGENTA, Fore.RED, Fore.WHITE, Fore.YELLOW])
+                    Fore.LIGHTGREEN_EX, Fore.LIGHTMAGENTA_EX, Fore.LIGHTRED_EX, Fore.LIGHTWHITE_EX,
+                    Fore.LIGHTYELLOW_EX, Fore.MAGENTA, Fore.RED, Fore.WHITE, Fore.YELLOW])
 
     from IPython import embed
     embed(header=f"""{colour}
