@@ -187,7 +187,7 @@ class Log:
         """Parses a game log entry from `EMOTE:` onwards (EMOTE: should not be included)"""
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
-        if not " (" in other:
+        if " (" not in other:
             self.text = other.strip()
             return
         action, location = other.split(' (', 1)
