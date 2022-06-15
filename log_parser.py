@@ -301,6 +301,7 @@ class LogFile:
             #if sqrt(pow(cur_loc[0] - log.location[0], 2) + pow(cur_loc[1] - log.location[1], 2)) - hearing_range < 0:
             if abs(cur_loc[0] - log.location[0]) - hearing_range < 0 and abs(cur_loc[1] - log.location[1]) - hearing_range < 0:
                 filtered.append(log)
+            # You (almost) always hear tcomms
             elif log.log_type == LogType.TCOMMS:
                 filtered.append(log)
 
