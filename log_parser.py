@@ -444,7 +444,7 @@ class LogFile:
         Example call: `my_logs = LogFile.from_file("game.txt")`
         
         Returns LogFile"""
-        if filename.endswith(".html"): UnsupportedLogTypeException(f"{filename} does not seem to be supported")
+        if filename.endswith(".html"): raise UnsupportedLogTypeException(f"{filename} does not seem to be supported")
         if not log_type and "." in filename:
             log_type = LogFileType.parse_log_file_type(filename.split(".", 1))
         with open(filename, "r", encoding = "utf-8") as f:
