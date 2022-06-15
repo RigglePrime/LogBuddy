@@ -292,7 +292,7 @@ class LogFile:
             # Filter logs that we don't care about but still use their location
             if logs_we_care_about and (logs_we_care_about != "ALL"):
                 continue
-            if type(logs_we_care_about) == list and not log.log_type in logs_we_care_about:
+            if type(logs_we_care_about) == list and log.log_type not in logs_we_care_about:
                 continue
             # Skip logs with no location data available
             if not log.location:
