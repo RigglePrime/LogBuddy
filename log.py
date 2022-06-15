@@ -249,7 +249,6 @@ class Log:
                     "is having the" in other:
                 patient = other.split(") ", 1)[0]
                 self.patient = Player.parse_player(patient)
-            pass # This stops the if chain from executing further
         # A large tuple... there is no better way, I thought for a long time
         # If you think of a better way, please PR it or make an issue report
 
