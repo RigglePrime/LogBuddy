@@ -50,7 +50,7 @@ class LogFile:
 
     Examples:
 
-    `log_file = LogFile() # Empty log file, useful for combining more later using `collate``,
+    `log_file = LogFile()` # Empty log file, useful for combining more later using `collate`,
     `log_file = LogFile(open("game.log").readlines(), LogFileType.UNKNOWN)`,
     `log_file = LogFile(["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
     """
