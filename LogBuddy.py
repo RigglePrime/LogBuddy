@@ -66,7 +66,7 @@ if __name__ == "__main__":
     del parser
     del args
 
-    help = _Helper() # When you bundle everything with pyinstaller, help stops working for some reason
+    help = _Helper()  # When you bundle everything with pyinstaller, help stops working for some reason
     colorama_init()
 
     # Hand pick random startup colours
