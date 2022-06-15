@@ -112,7 +112,7 @@ class Log:
         dt, other = self.raw_line.split("] ", 1)
         self.time = isoparse(dt[1:]) # Remove starting [
         if other.endswith("VOTE:"): other += " "
-        if not ": " in other and (" in " in other or " (as " in other): # This means it's probably a TGUI log
+        if ": " not in other and (" in " in other or " (as " in other): # This means it's probably a TGUI log
             # TGUI logs work the following way:
             # If it's a mob, add "[mob.ckey] (as [mob] at [mob.x],[mob.y],[mob.z])"
             # If it's a client, just add "[client.ckey]"
