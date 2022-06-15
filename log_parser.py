@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 import os
-from re import VERBOSE
 from log import Log, LogType
 from enum import Enum
-from math import sqrt, pow
 from typing import Annotated, Iterable, Union, Literal
 import traceback
 from html import unescape as html_unescape
