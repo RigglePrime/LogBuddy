@@ -400,7 +400,7 @@ class Log:
 
     def parse_tcomms(self, log: str) -> None:
         """Parses a game log entry from `TCOMMS:` onwards (TCOMMS: should not be included)"""
-        if not " (spans: " in log:
+        if " (spans: " not in log:
             # We only care about what people said on telecomms, not what device connected where
             return
 
@@ -490,7 +490,7 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         # Priority announcements, yet another exception
-        if other.startswith(("(priority announcement)", "(message to the other server)")) and not '" ' in other:
+        if other.startswith(("(priority announcement)", "(message to the other server)")) and '" ' not in other:
             self.text = html_unescape(other.strip())
             return
         text, other = other.split('" ', 1)
