@@ -287,12 +287,12 @@ class LogFile:
             # If our target didn't participate, we need to check how far away it happened
 
             # Check z-level, if they differ save location and continue
-            if not cur_loc[2] == last_loc[2]: 
+            if cur_loc[2] != last_loc[2]: 
                 continue
             # Filter logs that we don't care about but still use their location
             if logs_we_care_about and (logs_we_care_about != "ALL"):
                 continue
-            if type(logs_we_care_about) == list and not log.log_type in logs_we_care_about:
+            if type(logs_we_care_about) == list and log.log_type not in logs_we_care_about:
                 continue
             # Skip logs with no location data available
             if not log.location:
@@ -301,6 +301,7 @@ class LogFile:
             #if sqrt(pow(cur_loc[0] - log.location[0], 2) + pow(cur_loc[1] - log.location[1], 2)) - hearing_range < 0:
             if abs(cur_loc[0] - log.location[0]) - hearing_range < 0 and abs(cur_loc[1] - log.location[1]) - hearing_range < 0:
                 filtered.append(log)
+            # You (almost) always hear tcomms
             elif log.log_type == LogType.TCOMMS:
                 filtered.append(log)
 
@@ -493,7 +494,7 @@ class LogFile:
         import requests as req
         # Should be all supported log types as a default. Don't forget to update this list! (you will)
         if not logs_we_care_about: logs_we_care_about = ["game.txt", "attack.txt", "pda.txt", "silicon.txt", "mecha.txt", "virus.txt", "telecomms.txt", "uplink.txt", "shuttle.txt"]
-        if not link[-1] == "/": link += "/"
+        if link[-1] != "/": link += "/"
         log_collection = LogFile()
         for log_file in logs_we_care_about:
             if not quiet: print(f"Retrieving {log_file}")

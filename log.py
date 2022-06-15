@@ -112,7 +112,7 @@ class Log:
         dt, other = self.raw_line.split("] ", 1)
         self.time = isoparse(dt[1:]) # Remove starting [
         if other.endswith("VOTE:"): other += " "
-        if not ": " in other and (" in " in other or " (as " in other): # This means it's probably a TGUI log
+        if ": " not in other and (" in " in other or " (as " in other): # This means it's probably a TGUI log
             # TGUI logs work the following way:
             # If it's a mob, add "[mob.ckey] (as [mob] at [mob.x],[mob.y],[mob.z])"
             # If it's a client, just add "[client.ckey]"
@@ -187,7 +187,7 @@ class Log:
         """Parses a game log entry from `EMOTE:` onwards (EMOTE: should not be included)"""
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
-        if not " (" in other:
+        if " (" not in other:
             self.text = other.strip()
             return
         action, location = other.split(' (', 1)
@@ -249,7 +249,6 @@ class Log:
                     "is having the" in other:
                 patient = other.split(") ", 1)[0]
                 self.patient = Player.parse_player(patient)
-            pass # This stops the if chain from executing further
         # A large tuple... there is no better way, I thought for a long time
         # If you think of a better way, please PR it or make an issue report
 
@@ -309,7 +308,7 @@ class Log:
             other_temp = other.split(" ", 5)[5]
             parse_key = True
 
-        if parse_key and not other_temp[0] == "[":
+        if parse_key and other_temp[0] != "[":
             patient = other_temp.split(") ", 1)[0]
             if "/(" in patient:
                 self.patient = Player.parse_player(patient)
@@ -360,7 +359,7 @@ class Log:
             pda_type, other = other.strip(" (").split(" to ", 1)
             patient, other = other.split(') "', 1)
             # If this happens, it's probably a multiline PDA message... and if not? Another exception to add to the list...
-            if not '"' in other: 
+            if '"' not in other: 
                 text = other
             else:
                 text, location = other.split('" (', 1)
@@ -400,7 +399,7 @@ class Log:
 
     def parse_tcomms(self, log: str) -> None:
         """Parses a game log entry from `TCOMMS:` onwards (TCOMMS: should not be included)"""
-        if not " (spans: " in log:
+        if " (spans: " not in log:
             # We only care about what people said on telecomms, not what device connected where
             return
 
@@ -490,7 +489,7 @@ class Log:
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         # Priority announcements, yet another exception
-        if other.startswith(("(priority announcement)", "(message to the other server)")) and not '" ' in other:
+        if other.startswith(("(priority announcement)", "(message to the other server)")) and '" ' not in other:
             self.text = html_unescape(other.strip())
             return
         text, other = other.split('" ', 1)
