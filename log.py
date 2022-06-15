@@ -309,7 +309,7 @@ class Log:
             other_temp = other.split(" ", 5)[5]
             parse_key = True
 
-        if parse_key and not other_temp[0] == "[":
+        if parse_key and other_temp[0] != "[":
             patient = other_temp.split(") ", 1)[0]
             if "/(" in patient:
                 self.patient = Player.parse_player(patient)
