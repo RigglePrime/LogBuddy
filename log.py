@@ -360,7 +360,7 @@ class Log:
             pda_type, other = other.strip(" (").split(" to ", 1)
             patient, other = other.split(') "', 1)
             # If this happens, it's probably a multiline PDA message... and if not? Another exception to add to the list...
-            if not '"' in other: 
+            if '"' not in other: 
                 text = other
             else:
                 text, location = other.split('" (', 1)
