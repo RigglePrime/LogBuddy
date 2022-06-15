@@ -40,7 +40,7 @@ class LogFileType(Enum):
         return [x for x in LogFileType]
 
 class LogFile:
-    """An object representing a log file. Most functions use `self.work_set`, original logs sotred in `self.logs`.
+    """An object representing a log file. Most functions use `self.work_set`, original logs sorted in `self.logs`.
 
     Parameters:
     `logs` (list[str]): list of log lines
