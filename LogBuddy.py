@@ -2,7 +2,7 @@
 import inspect
 import os
 from typing import Any
-from colorama import Fore, Back, init as colorama_init
+from colorama import Fore, init as colorama_init
 
 # Log is unused, but it's here so the user doesn't have to import it manually
 from log import Log, LogType
