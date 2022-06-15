@@ -287,7 +287,7 @@ class LogFile:
             # If our target didn't participate, we need to check how far away it happened
 
             # Check z-level, if they differ save location and continue
-            if not cur_loc[2] == last_loc[2]: 
+            if cur_loc[2] != last_loc[2]: 
                 continue
             # Filter logs that we don't care about but still use their location
             if logs_we_care_about and (logs_we_care_about != "ALL"):
