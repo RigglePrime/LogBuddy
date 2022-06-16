@@ -59,7 +59,7 @@ class SiliconLogType(Enum):
     MISC = 0
     CYBORG = 1
     LAW = 2
-    
+
 class Player:
     ckey: Optional[str]
     mob_name: Optional[str]
@@ -67,7 +67,7 @@ class Player:
     def __init__(self, ckey: str, mob_name: str) -> None:
         self.ckey = None if ckey == "*no key*" else ckey
         self.mob_name = mob_name
-    
+
     def __str__(self) -> str:
         return f"{self.ckey}/({self.mob_name})"
 
@@ -217,23 +217,24 @@ class Log:
             self.location_name = other[:loc_start].split("(")[-1].strip()
             other = other[:loc_start].replace(self.location_name, "").strip(" (")
         # Combat mode regex
-        r = re.search("\(COMBAT MODE: (\d)\)", other)
-        if r: 
-            self.combat_mode = bool(int(r.group(1)))
-            other = other.replace(r.group(0), "")
+        match = re.search(r"\(COMBAT MODE: (\d)\)", other)
+        if match:
+            self.combat_mode = bool(int(match.group(1)))
+            other = other.replace(match.group(0), "")
         # Damage type regex
-        r = re.search("\(DAMTYPE: (\w+)\)", other)
-        if r: 
-            self.damage_type = DamageType.parse_damage_type(r.group(1))
-            other = other.replace(r.group(0), "")
+        match = re.search(r"\(DAMTYPE: (\w+)\)", other)
+        if match:
+            self.damage_type = DamageType.parse_damage_type(match.group(1))
+            other = other.replace(match.group(0), "")
         # New HP regex
-        r = re.search("\(NEWHP: (-?\d+\.?\d?)\)", other)
-        if r: 
-            self.new_hp = float(r.group(1))
-            other = other.replace(r.group(0), "")
-        
-        # NOTE: There is no better way of doing this. Why? Because the ckey isn't a ckey, it's a key WHICH COULD
-        # CONTAIN SPACES AND IT'S IMPOSSIBLE TO TELL WHAT IS PART OF THE KEY AND WHAT ISN'T. I love SS13 logs.
+        match = re.search(r"\(NEWHP: (-?\d+\.?\d?)\)", other)
+        if match:
+            self.new_hp = float(match.group(1))
+            other = other.replace(match.group(0), "")
+
+        # NOTE: There is no better way of doing this. Why? Because the ckey isn't a ckey,
+        # it's a key WHICH COULD CONTAIN SPACES AND IT'S IMPOSSIBLE TO TELL WHAT IS PART
+        # OF THE KEY AND WHAT ISN'T. I love SS13 logs.
         parse_key = False
         other_temp = None
         # One word
@@ -304,7 +305,8 @@ class Log:
             other_temp = other.split(" ", 4)[4]
             parse_key = True
         # Five words
-        elif other.startswith(("has tended to the wounds", "has attempted to neck grab", "has overloaded the heart of")):
+        elif other.startswith(("has tended to the wounds", "has attempted to neck grab",
+                                "has overloaded the heart of")):
             other_temp = other.split(" ", 5)[5]
             parse_key = True
 
@@ -313,8 +315,9 @@ class Log:
             if "/(" in patient:
                 self.patient = Player.parse_player(patient)
             del other_temp
-        # NOTE: surgery related logs were not added, as they are quite rare and I don't think they'd contribute much. Feel free
-        # to add them yourself. (example: "has surgically removed")
+        # NOTE: surgery related logs were not added, as they are quite rare and I don't
+        # think they'd contribute much. Feel free to add them yourself.
+        # Example: "has surgically removed"
         # On another note, `attached a the saline-glucose solution bottle to the`
         self.text = other.strip()
 
@@ -349,17 +352,18 @@ class Log:
         # Sending a message with the message monitor console adds a "sent " FOR NO PARTICULAR REASON
         # It gets better... it also moves " to "...
         if "PDA: message monitor console" in other:
-            pda_type, other = other.split(') sent "')
+            _pda_type, other = other.split(') sent "')
             text, other = other.split('" to ', 1)
             loc_start = self.parse_and_set_location(other)
             self.location_name = other[:loc_start].split("(")[-1].strip()
             # -1 for a space that we stripped, and an extra 1 for the bracket
             patient = other[:loc_start - len(self.location_name) - 2].strip()
         else:
-            pda_type, other = other.strip(" (").split(" to ", 1)
+            _pda_type, other = other.strip(" (").split(" to ", 1)
             patient, other = other.split(') "', 1)
-            # If this happens, it's probably a multiline PDA message... and if not? Another exception to add to the list...
-            if '"' not in other: 
+            # If this happens, it's probably a multiline PDA message...
+            # And if not? Another exception to add to the list...
+            if '"' not in other:
                 text = other
             else:
                 text, location = other.split('" (', 1)
@@ -411,10 +415,10 @@ class Log:
             self.agent = Player(None, agent)
         channel, other = other.split("] (", 1)
         self.telecomms_network = channel
-        spans, other = other.split(') "', 1)
+        _spans, other = other.split(') "', 1)
         text, other = other.split('" (', 1)
         self.text = html_unescape(text.strip())
-        language, location = other.split(") (", 1)
+        _language, location = other.split(") (", 1)
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start].strip()
 
@@ -473,7 +477,7 @@ class Log:
         Returns the position of the location in the string as in integer"""
         # NOTE: this does not set location name, as it is not always present
         # Find all possible location strings
-        r = re.findall("\(\d{1,3},\d{1,3},\d{1,2}\)", log)
+        r = re.findall(r"\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
         if not len(r): return -1 
         # Get location of last match
@@ -498,7 +502,7 @@ class Log:
         other = other.strip()
         if other:
             self.text += " | " + other
-        
+
         self.is_dead = False
         if "(DEAD)" in text:
             text = text.replace("(DEAD) ", "", 1)
