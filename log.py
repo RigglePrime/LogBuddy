@@ -135,8 +135,9 @@ class Log:
         log_type, other = other.split(": ", 1)
         self.log_type = LogType.parse_log_type(log_type)
         # Python go brrrrrrr
-        f = getattr(self, f"parse_{self.log_type.name.lower()}", None)
-        if f: f(other)
+        parsing_function = getattr(self, f"parse_{self.log_type.name.lower()}", None)
+        if parsing_function:
+            parsing_function(other)
 
     time: Annotated[datetime, "Time of logging"]
     agent: Annotated[Optional[Player], "Player performing the action"]
@@ -417,7 +418,7 @@ class Log:
 
         self.is_dead = False
         agent, other = log.split(" [", 1)
-        if ("/(") in agent:
+        if "/(" in agent:
             self.agent = Player.parse_player(agent)
         else:
             self.agent = Player(None, agent)
@@ -460,7 +461,7 @@ class Log:
             key, other = other.split(" (as ", 1)
             mob, other = other.split(" at ", 1)
             location, other = other.split(")", 1)
-            
+
             #Can't use parse_and_set_location because it's a snowflake log yet again! Fun.
             self.location = tuple(int(x) for x in location.split(","))
 
@@ -485,15 +486,15 @@ class Log:
         Returns the position of the location in the string as in integer"""
         # NOTE: this does not set location name, as it is not always present
         # Find all possible location strings
-        r = re.findall(r"\(\d{1,3},\d{1,3},\d{1,2}\)", log)
+        match = re.findall(r"\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
-        if not len(r): return -1 
+        if not len(match): return -1 
         # Get location of last match
-        loc = log.index(r[-1]) 
+        loc = log.index(match[-1]) 
         # Take the last result from the regex, remove the first and last character and turn into a list
-        r = r[-1][1:-1].split(",")
+        match = match[-1][1:-1].split(",")
         # Turn all elements to ints, convert to tuple
-        self.location = tuple([int(x) for x in r]) # Bad practice since it's a side effect
+        self.location = tuple([int(x) for x in match]) # Bad practice since it's a side effect
         return loc
 
     def generic_say_parse(self, log: str) -> None:
