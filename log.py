@@ -41,6 +41,7 @@ class LogType(Enum):
             return LogType.UNKNOWN
 
 class DamageType(Enum):
+    """What type of damage is it? (enum)"""
     UNKNOWN = 0
     BRUTE = 1
     BURN = 2
@@ -56,11 +57,13 @@ class DamageType(Enum):
             return DamageType.UNKNOWN
 
 class SiliconLogType(Enum):
+    """What type of silicon log is it? (enum)"""
     MISC = 0
     CYBORG = 1
     LAW = 2
 
 class Player:
+    """This class holds methods for parsing ckey strings ('ckey/(name)')"""
     ckey: Optional[str]
     mob_name: Optional[str]
 
@@ -90,15 +93,17 @@ class Player:
         # Above does not work since it catches "has grabbed MY NAME/(John Smith)" as the ckey "has grabbed MY NAME"
         raise Exception("Not yet implemented")
 
-class UnknownLogException(Exception): pass
+class UnknownLogException(Exception):
+    """Thrown when a log type is not known. (so unexpected!)"""
 
 class Log:
     """Represents one log entry
-    
+
     Examples:
     log = `Log("log line here")` # NOTE: must be a valid log entry"""
     def __init__(self, line: Optional[str] = None) -> None:
-        if not line or line[0] != "[": raise UnknownLogException("Does not start with [")
+        if not line or line[0] != "[":
+            raise UnknownLogException("Does not start with [")
 
         self.time = None
         self.agent = None
@@ -111,17 +116,20 @@ class Log:
         self.raw_line = line
         dt, other = self.raw_line.split("] ", 1)
         self.time = isoparse(dt[1:]) # Remove starting [
-        if other.endswith("VOTE:"): other += " "
-        if ": " not in other and (" in " in other or " (as " in other): # This means it's probably a TGUI log
+        if other.endswith("VOTE:"):
+            other += " "
+
+        # Check for TGUI logs
+        if ": " not in other and (" in " in other or " (as " in other):
             # TGUI logs work the following way:
             # If it's a mob, add "[mob.ckey] (as [mob] at [mob.x],[mob.y],[mob.z])"
             # If it's a client, just add "[client.ckey]"
             # Now it checks for context and window. If any of those are true, it
             # appends " in [window]" (or context instead of window).
             # You see, here's the problem. What if we only have a client and no window or context?
-            # Is that even possible? I am too lazy to make sure and will assume it's not. If it is, hi! Welcome to hell.
-            # Please edit the conditional before to work. Just know that it will catch false positives.
-            # What fun world of logging we live in. 
+            # Is that even possible? I am too lazy to make sure and will assume it's not.
+            # If it is, hi! Welcome to hell. Please edit the conditional before to work.
+            # Just know that it will catch false positives. What fun world of logging we live in.
             self.parse_tgui(other)
             return
         log_type, other = other.split(": ", 1)
