@@ -41,7 +41,9 @@ To reset the work set and remove all filters, call `main_file.reset_work_set()`.
 ## Example
 
 In this example it's assumed you ran the application with no command line arguments (double clicking
-on the executable).
+on the executable). To copy something, select it and right click. Topaste it, right click with nothing
+selected. This can unfortunately not be changed as it's a Windows quirk. For different functionality,
+run this from a different command prompt like Windows Terminal.
 
 At any point feel free to type `help` for general help, or `help(thing)` for help with that specific
 thing (for example `help(LogFile)`).
