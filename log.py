@@ -35,6 +35,7 @@ class LogType(Enum):
 
     @staticmethod
     def parse_log_type(string: str):
+        """Gets the log type from a string"""
         try:
             return LogType[string.upper()]
         except KeyError:
@@ -51,6 +52,7 @@ class DamageType(Enum):
 
     @staticmethod
     def parse_damage_type(string: str):
+        """Gets the damage type from a string"""
         try:
             return DamageType[string.upper()]
         except KeyError:
