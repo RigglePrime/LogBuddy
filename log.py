@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-from dateutil.parser import isoparse
 from datetime import datetime
 from enum import Enum
 from typing import Annotated, Tuple, Optional
 import re
 from html import unescape as html_unescape
 
+from dateutil.parser import isoparse
+
 class LogType(Enum):
+    """What type of log file is it?"""
     UNKNOWN = 0
     ACCESS = 1
     GAME = 2
