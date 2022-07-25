@@ -10,11 +10,15 @@ from html import unescape as html_unescape
 
 HEARING_RANGE = 9
 
-class NotSortableException(Exception): pass
-class InvalidType(Exception): pass
-class UnsupportedLogTypeException(Exception): pass
+class NotSortableException(Exception):
+    """Hey, I can't sort this!"""
+class InvalidType(Exception):
+    """What kind of type is this..."""
+class UnsupportedLogTypeException(Exception):
+    """Strange log type you have there"""
 
 class LogFileType(Enum):
+    """Enum of possible log file types"""
     UNKNOWN = 0
     COLLATED = 1
     GAME = 2
@@ -37,6 +41,7 @@ class LogFileType(Enum):
 
     @staticmethod
     def list():
+        """Returns all possible log file types"""
         return [x for x in LogFileType]
 
 class LogFile:
@@ -61,7 +66,7 @@ class LogFile:
     sortable: bool
     log_source: Annotated[str, "Source of the logs (if available)"]
 
-    def __init__(self, logs: list[str] = [], type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> None:
+    def __init__(self, logs: list[str] = None, log_type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> None:
         if verbose and quiet:
             print("Really? You want me to be silent and verbose? Those are mutually exclusive you know")
         self.round_id = -1
@@ -69,22 +74,27 @@ class LogFile:
         self.logs = []
         self.who = []
         self.sortable = True
-        self.log_type = type
+        self.log_type = log_type
 
-        if not logs: return
+        if not logs:
+            return
         if "Starting up round ID" in logs[0]:
             self.round_id = int(logs[0].split("Starting up round ID ")[1].strip(". \r\n")) # Also remove \r\n just in case, had some errors with that before
             logs = logs[2:]
 
         for line in logs:
-            if not line: continue
+            if not line:
+                continue
             try:
                 line = line.strip("\r\n ")
-                if line.startswith("-censored"): continue # Skip censored lines
+                if line.startswith("-censored"):
+                    continue # Skip censored lines
+
                 # VOTE is split into multiple lines, so account for that
                 if line.startswith("- <b>") and self.unfiltered_logs and self.unfiltered_logs[-1].log_type == LogType.VOTE:
                     self.unfiltered_logs[-1].text += ", " + html_unescape(line.replace("- <b>", "").replace("</b>", ""))
                     continue
+
                 # Priority announcements (and others like it) sometimes do this
                 elif line.startswith("- ") and self.unfiltered_logs:
                     # Don't actually insert a new line
@@ -93,10 +103,13 @@ class LogFile:
                     self.unfiltered_logs.pop()
                 log = Log(line)
                 self.unfiltered_logs.append(log)
-                if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who: self.who.append(log.agent.ckey.replace("[DC]",""))
-            except Exception as e:
-                if not quiet: print(f"Could not be parsed: '{line}', with the reason:", e)
-                if verbose: traceback.print_exc()
+                if log.agent and log.agent.ckey and log.agent.ckey.replace("[DC]","") not in self.who:
+                    self.who.append(log.agent.ckey.replace("[DC]",""))
+            except Exception as exception:
+                if not quiet:
+                    print(f"Could not be parsed: '{line}', with the reason:", exception)
+                if verbose:
+                    traceback.print_exc()
         self.unfiltered_logs.sort(key=lambda l:l.time)
         self.logs = self.unfiltered_logs
 
@@ -141,9 +154,9 @@ class LogFile:
 
     def sort(self) -> None:
         """Sorts the current work set, using the time at which the log was added, descending
-        
+
         Example call: `my_logs.sort()`
-        
+
         Returns None"""
         if not self.sortable: raise NotSortableException("Not enough information to sort the logs")
         self.logs.sort(key=lambda l:l.time)
@@ -152,7 +165,7 @@ class LogFile:
         """Collates (extends, adds together) two LogFile objects and changes the LogFileType to COLLATED.
         The result is stored in the the object this was called on. A call to this function will reset the
         current work set.
-        
+
         Parameters:
         `logfile` (LogFile): the LogFile object you want to combine
 
@@ -170,12 +183,12 @@ class LogFile:
     def filter_ckeys(self, *ckeys: str) -> None:
         """Removes all logs in which the specified ckeys are not present, saving the result in self.work_set. Works much like Notepad++,
         but only counts the agent (actor, the one who performed the action). See `filter_strings` for a function like Notepad++ bookmark
-        
+
         Parameters:
         `ckeys` (tuple[str, ...]): ckeys to filter
 
         Example call: `my_logs.filter_ckeys("ckey1", "ckey2")` (as many or little ckeys as you want)
-        
+
         Returns `None`"""
         filtered = []
         for log in self.logs:
@@ -188,13 +201,13 @@ class LogFile:
 
     def filter_strings(self, *strings: str, case_sensitive: bool = False) -> None:
         """Removes all logs in which the specified strings are not present, saving them in `self.work_set`. Works exactly like Notepad++ bookmark
-        
+
         Parameters:
         `strings` (tuple[str, ...]): strings to filter
         `case_sensitive` (bool): toggles case sensitivity
 
         Example calls: `my_logs.filter_strings("Hi!")`, `my_logs.filter_strings("attacked", "injected", "I hate you")`, `my_logs.filter_strings("racial slur", case_sensitive=True)` (as many strings as you want)
-        
+
         Returns `None`"""
         filtered = []
         for log in self.logs:
@@ -218,19 +231,19 @@ class LogFile:
 
     def filter_heard(self, ckey: str, walking_error: int = 4) -> None:
         """Removes all log entries which could not have been heard by the specified ckey (very much in alpha) and stores the remaining lines in `self.work_set`
-        
+
         Parameters:
         `ckey` (str): desired ckey
         `walking_error` (int): added to hearing range to account for the lack of logs
 
         Example call: `my_logs.filter_heard("ckey")`
-        
+
         Returns `None`"""
         self.logs = self.get_only_heard(ckey, walking_error = walking_error)
 
     def filter_conversation(self, *ckeys: str, walking_error: int = 4) -> None: # TODO: hide lines not in conversation
         """Tries to get a conversation between multiple parties, excluding what they would and would not hear. Only accounts for local say (for now). Saves the result in `self.work_set`
-        
+
         Parameters:
         `ckeys` (tuple[str, ...]): ckeys to use for sorting
         `walking_error` (int): added to hearing range to account for the lack of logs
@@ -252,7 +265,7 @@ class LogFile:
 
     def reset_work_set(self):
         """Removes all filters; sets the working set to be equal to all logs
-        
+
         Example call: my_logs.reset_work_set()"""
         self.logs = self.unfiltered_logs
 
@@ -265,7 +278,7 @@ class LogFile:
         `walking_error` (int): added to hearing range to account for the lack of logs
 
         Example calls: `my_logs.get_only_heard("ckey")`, `my_logs.get_only_heard("ckey", "ALL")`, `my_logs.get_only_heard("ckey", [LogType.SAY, LogType.WHISPER])`
-        
+
         Returns `list[Log]`"""
         self.sort()
         # Adjust for error created by lack of logs
@@ -308,12 +321,12 @@ class LogFile:
     def filter_by_location_name(self, location_name: str) -> None:
         """Removes all logs that did not happen in the specified location,
         and stores the result in the work set.
-        
+
         Parameters:
         `location_name` (str): the name of the location, case insensitive
 
         Example call: my_logs.filter_by_location_name("Bar")
-        
+
         Returns `None`"""
         filtered = []
         for log in self.logs:
@@ -327,13 +340,13 @@ class LogFile:
     def filter_by_radius(self, location: tuple[int, int, int], radius: int) -> None:
         """Removes all logs that did not happen in the specified radius around the location,
         and stores the result in the work set.
-        
+
         Parameters:
         `location` (tuple[int, int, int]): the location
         `radius` (int): the radius
 
         Example call: `my_logs.filter_by_radius((32, 41, 2), 5)`
-        
+
         Returns None"""
         filtered = []
         for log in self.logs:
@@ -348,11 +361,11 @@ class LogFile:
 
     def filter_by_type(self, include: Iterable[LogType] = [], exclude: Iterable[LogType] = []):
         """Only keeps (or removes) logs lines of the specified type.
-        
+
         Parameters:
         `include` (tuple[LogType]): log types to include
         `exclude` (tuple[LogType]): log types to exclude
-        
+
         If the same type is seen in include and exclude, it will be excluded.
         To get a list of all available LogTypes call `LogType.list()`
 
@@ -373,9 +386,9 @@ class LogFile:
 
     def print_working(self) -> None:
         """Prints working set to the console
-        
+
         Example call: `my_logs.print_working()`
-        
+
         Returns `None`"""
         if not self.logs:
             print("Working set empty")
@@ -415,12 +428,12 @@ class LogFile:
 
     def write_working_to_file(self, filename: str) -> None:
         """Writes current `self.work_set` to the desired file.
-        
+
         Parameters:
         `filename` (str): name of the file to write to (overwrites everything)
 
         Example call: `my_logs.write_working_to_file("logs.txt")`
-        
+
         Returns None"""
         with open(filename, "w", encoding = "utf-8") as f:
             for log in self.logs:
@@ -433,7 +446,7 @@ class LogFile:
     @staticmethod
     def from_file(filename: str, log_type: LogFileType = None, verbose: bool = False, quiet: bool = False) -> LogFile:
         """Parses the specified log file
-        
+
         Parameters:
         `filename` (str): name (and location) of the desired file
         `type` (LogFileType): type of the log. Use if you want to override log type detection (optional, defaults to LogFileType.UNKNOWN)
@@ -441,7 +454,7 @@ class LogFile:
         `quiet` (bool): toggle quiet mode (False by default)
 
         Example call: `my_logs = LogFile.from_file("game.txt")`
-        
+
         Returns LogFile"""
         if filename.endswith(".html"): raise UnsupportedLogTypeException(f"{filename} does not seem to be supported")
         if not log_type and "." in filename:
@@ -453,14 +466,14 @@ class LogFile:
     @staticmethod
     def from_folder(folder: str, verbose: bool = False, quiet: bool = False) -> LogFile:
         """Parses all log files in a folder, combining them into a single file
-        
+
         Parameters:
         `filename` (str): name (and location) of the desired folder
         `verbose` (bool): toggle verbose mode (False by default)
         `quiet` (bool): toggle quiet mode (False by default)
 
         Example call: `my_logs = LogFile.from_file("game.txt")`
-        
+
         Returns `LogFile`"""
         if not os.path.isdir(folder): raise Exception("Is not a folder")
         folder = folder.replace("\\", "/")
