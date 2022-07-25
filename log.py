@@ -33,6 +33,7 @@ class LogType(Enum):
 
     @staticmethod
     def list():
+        """Lists all log types"""
         return [x for x in LogType]
 
     @staticmethod
