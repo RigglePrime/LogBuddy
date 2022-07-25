@@ -84,18 +84,22 @@ class Player:
 
     @staticmethod
     def parse_player(string: str):
-        """Gets player's ckey and name from the following format: 'ckey/(name)' (parentheses not required)"""
+        """Gets player's ckey and name from the following format:
+        'ckey/(name)' (parentheses not required)"""
         ckey, name = string.strip().split("/", 1)
         return Player(ckey, name.strip("()"))
 
     @staticmethod
     def parse_players_from_full_log(string: str):
-        """Gets all players from a full log line. Currently not implemented. (will be soon hopefully)"""
+        """Gets all players from a full log line. Currently not implemented.
+        (will be soon hopefully)"""
         # (\w+|\*no key\*)\/\(((?:\w+ ?)+?)\)
-        # The above regex is not yet good enough, it catches "MY NAME/(John Smith)" as the ckey "NAME"
+        # The above regex is not yet good enough, it catches
+        # "MY NAME/(John Smith)" as the ckey "NAME"
 
         # ((?:\w+ ?)+|\*no key\*)\/\(((?:\w+ ?)+?)\)
-        # Above does not work since it catches "has grabbed MY NAME/(John Smith)" as the ckey "has grabbed MY NAME"
+        # Above does not work since it catches "has grabbed MY NAME/(John Smith)"
+        # as the ckey "has grabbed MY NAME"
         raise Exception("Not yet implemented")
 
 class UnknownLogException(Exception):
@@ -119,8 +123,8 @@ class Log:
         self.is_dead = None
 
         self.raw_line = line
-        dt, other = self.raw_line.split("] ", 1)
-        self.time = isoparse(dt[1:]) # Remove starting [
+        date_time, other = self.raw_line.split("] ", 1)
+        self.time = isoparse(date_time[1:]) # Remove starting [
         if other.endswith("VOTE:"):
             other += " "
 
