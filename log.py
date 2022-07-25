@@ -37,7 +37,7 @@ class LogType(Enum):
     def parse_log_type(string: str):
         try:
             return LogType[string.upper()]
-        except:
+        except KeyError:
             return LogType.UNKNOWN
 
 class DamageType(Enum):
@@ -53,7 +53,7 @@ class DamageType(Enum):
     def parse_damage_type(string: str):
         try:
             return DamageType[string.upper()]
-        except:
+        except KeyError:
             return DamageType.UNKNOWN
 
 class SiliconLogType(Enum):
