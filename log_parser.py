@@ -96,7 +96,7 @@ class LogFile:
                     continue
 
                 # Priority announcements (and others like it) sometimes do this
-                elif line.startswith("- ") and self.unfiltered_logs:
+                if line.startswith("- ") and self.unfiltered_logs:
                     # Don't actually insert a new line
                     line = self.unfiltered_logs[-1].raw_line + "\\n" + line.replace("- ", "")
                     # Remove the incomplete entry (so we can parse location too!)
