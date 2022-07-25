@@ -544,6 +544,6 @@ class Log:
         return self.raw_line
 
 if __name__ == "__main__":
-    log = Log(input())
-    print(log)
-    print(log.__dict__)
+    single_log = Log(input())
+    print(single_log)
+    print(single_log.__dict__)
