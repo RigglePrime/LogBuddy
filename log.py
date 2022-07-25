@@ -176,7 +176,8 @@ class Log:
         self.text = log
 
     def parse_adminprivate(self, log: str) -> None:
-        """Parses a game log entry from `ADMINPRIVATE:` onwards (ADMINPRIVATE: should not be included)"""
+        """Parses a game log entry from `ADMINPRIVATE:` onwards
+        (ADMINPRIVATE: should not be included)"""
         # TODO: add better parsing for tickets
         self.text = log
 
@@ -398,10 +399,11 @@ class Log:
         if log.startswith("A culture bottle was printed for the virus"):
             agent = log.split(") by ", 1)[1]
             self.agent = Player.parse_player(agent)
-            self.virus_name, other = log.split("A culture bottle was printed for the virus ")[1].split(" sym:", 1)
+            self.virus_name, other = log.split("A culture bottle was printed for the virus ")[1]\
+                                                            .split(" sym:", 1)
             self.text = "printed, sym:" + other.strip()
         else:
-            agent, other = log.split(" was infected by virus: ") 
+            agent, other = log.split(" was infected by virus: ")
             self.agent = Player.parse_player(agent)
             virus_name, other = other.split(" sym:")
             self.virus_name = virus_name
@@ -482,15 +484,16 @@ class Log:
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
-        
+
         Returns the position of the location in the string as in integer"""
         # NOTE: this does not set location name, as it is not always present
         # Find all possible location strings
         match = re.findall(r"\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
-        if not len(match): return -1 
+        if not len(match):
+            return -1
         # Get location of last match
-        loc = log.index(match[-1]) 
+        loc = log.index(match[-1])
         # Take the last result from the regex, remove the first and last character and turn into a list
         match = match[-1][1:-1].split(",")
         # Turn all elements to ints, convert to tuple
@@ -498,11 +501,13 @@ class Log:
         return loc
 
     def generic_say_parse(self, log: str) -> None:
-        """Parses a generic SAY log entry from SAY: onwards (includes SAY, WHISPER, OOC) (should only include line from SAY: onwards, without the SAY)"""
+        """Parses a generic SAY log entry from SAY: onwards (includes SAY, WHISPER, OOC)
+        (should only include line from SAY: onwards, without the SAY)"""
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         # Priority announcements, yet another exception
-        if other.startswith(("(priority announcement)", "(message to the other server)")) and '" ' not in other:
+        if other.startswith(("(priority announcement)", "(message to the other server)")) and \
+                            '" ' not in other:
             self.text = html_unescape(other.strip())
             return
         text, other = other.split('" ', 1)
