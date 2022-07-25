@@ -36,7 +36,7 @@ class LogFileType(Enum):
     def parse_log_file_type(string: str):
         try:
             return LogFileType[string.upper()]
-        except:
+        except KeyError:
             return LogFileType.UNKNOWN
 
     @staticmethod
@@ -359,7 +359,7 @@ class LogFile:
             return
         self.logs = filtered
 
-    def filter_by_type(self, include: Iterable[LogType] = [], exclude: Iterable[LogType] = []):
+    def filter_by_type(self, include: Iterable[LogType] = None, exclude: Iterable[LogType] = None):
         """Only keeps (or removes) logs lines of the specified type.
 
         Parameters:
@@ -377,7 +377,7 @@ class LogFile:
 
         filtered = []
         for log in self.logs:
-            if (include and log.log_type in include) and log.log_type not in exclude:
+            if (include and log.log_type in include) and (exclude and log.log_type not in exclude):
                 filtered.append(log)
         if not filtered:
             print("Operation completed with empty set. Aborting.")
