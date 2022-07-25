@@ -491,7 +491,7 @@ class Log:
 
         # Set text to 'Empty' if other is empty, since we're expecting
         # extra data (newlines will get appended)
-        self.text = other or "Empty" 
+        self.text = other or "Empty"
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
