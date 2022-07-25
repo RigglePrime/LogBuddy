@@ -2,10 +2,10 @@
 import inspect
 import os
 from typing import Any
-from colorama import Fore, Back, init as colorama_init
+from colorama import Fore, init as colorama_init
 
 # Log is unused, but it's here so the user doesn't have to import it manually
-from log import Log, LogType
+from log import Log, LogType  # noqa: F401
 from log_parser import LogFile
 from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
 
@@ -28,9 +28,11 @@ You can exit by typing '{Fore.GREEN}exit{Fore.RESET}' or pressing {Fore.YELLOW}C
 
 For Python's interactive help, type '{Fore.GREEN}help(){Fore.RESET}', or '{Fore.GREEN}help(object){Fore.RESET}' for help about object (for example: '{Fore.GREEN}help(LogFile){Fore.RESET}')."""
 
+
 def functions(cls: object) -> list[tuple[str, Any]]:
     """Returns all methods of an object"""
     return inspect.getmembers(cls, predicate=inspect.ismethod)
+
 
 def variables(cls: object) -> dict[str, Any]:
     """Returns all variables of an object"""
@@ -64,14 +66,14 @@ if __name__ == "__main__":
     del parser
     del args
 
-    help = _Helper() # When you bundle everything with pyinstaller, help stops working for some reason
+    help = _Helper()  # When you bundle everything with pyinstaller, help stops working for some reason
     colorama_init()
 
     # Hand pick random startup colours
     from random import choice
     colour = choice([Fore.BLUE, Fore.CYAN, Fore.GREEN, Fore.LIGHTBLUE_EX, Fore.LIGHTCYAN_EX,
-            Fore.LIGHTGREEN_EX, Fore.LIGHTMAGENTA_EX, Fore.LIGHTRED_EX, Fore.LIGHTWHITE_EX,
-            Fore.LIGHTYELLOW_EX, Fore.MAGENTA, Fore.RED, Fore.WHITE, Fore.YELLOW])
+                    Fore.LIGHTGREEN_EX, Fore.LIGHTMAGENTA_EX, Fore.LIGHTRED_EX, Fore.LIGHTWHITE_EX,
+                    Fore.LIGHTYELLOW_EX, Fore.MAGENTA, Fore.RED, Fore.WHITE, Fore.YELLOW])
 
     from IPython import embed
     embed(header=f"""{colour}

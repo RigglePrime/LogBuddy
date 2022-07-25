@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-from dateutil.parser import isoparse
 from datetime import datetime
 from enum import Enum
 from typing import Annotated, Tuple, Optional
 import re
 from html import unescape as html_unescape
 
+from dateutil.parser import isoparse
+
 class LogType(Enum):
+    """What type of log file is it?"""
     UNKNOWN = 0
     ACCESS = 1
     GAME = 2
@@ -31,16 +33,19 @@ class LogType(Enum):
 
     @staticmethod
     def list():
+        """Lists all log types"""
         return [x for x in LogType]
 
     @staticmethod
     def parse_log_type(string: str):
+        """Gets the log type from a string"""
         try:
             return LogType[string.upper()]
-        except:
+        except KeyError:
             return LogType.UNKNOWN
 
 class DamageType(Enum):
+    """What type of damage is it? (enum)"""
     UNKNOWN = 0
     BRUTE = 1
     BURN = 2
@@ -50,24 +55,27 @@ class DamageType(Enum):
 
     @staticmethod
     def parse_damage_type(string: str):
+        """Gets the damage type from a string"""
         try:
             return DamageType[string.upper()]
-        except:
+        except KeyError:
             return DamageType.UNKNOWN
 
 class SiliconLogType(Enum):
+    """What type of silicon log is it? (enum)"""
     MISC = 0
     CYBORG = 1
     LAW = 2
-    
+
 class Player:
+    """This class holds methods for parsing ckey strings ('ckey/(name)')"""
     ckey: Optional[str]
     mob_name: Optional[str]
 
     def __init__(self, ckey: str, mob_name: str) -> None:
         self.ckey = None if ckey == "*no key*" else ckey
         self.mob_name = mob_name
-    
+
     def __str__(self) -> str:
         return f"{self.ckey}/({self.mob_name})"
 
@@ -76,29 +84,35 @@ class Player:
 
     @staticmethod
     def parse_player(string: str):
-        """Gets player's ckey and name from the following format: 'ckey/(name)' (parentheses not required)"""
+        """Gets player's ckey and name from the following format:
+        'ckey/(name)' (parentheses not required)"""
         ckey, name = string.strip().split("/", 1)
         return Player(ckey, name.strip("()"))
 
     @staticmethod
     def parse_players_from_full_log(string: str):
-        """Gets all players from a full log line. Currently not implemented. (will be soon hopefully)"""
+        """Gets all players from a full log line. Currently not implemented.
+        (will be soon hopefully)"""
         # (\w+|\*no key\*)\/\(((?:\w+ ?)+?)\)
-        # The above regex is not yet good enough, it catches "MY NAME/(John Smith)" as the ckey "NAME"
+        # The above regex is not yet good enough, it catches
+        # "MY NAME/(John Smith)" as the ckey "NAME"
 
         # ((?:\w+ ?)+|\*no key\*)\/\(((?:\w+ ?)+?)\)
-        # Above does not work since it catches "has grabbed MY NAME/(John Smith)" as the ckey "has grabbed MY NAME"
+        # Above does not work since it catches "has grabbed MY NAME/(John Smith)"
+        # as the ckey "has grabbed MY NAME"
         raise Exception("Not yet implemented")
 
-class UnknownLogException(Exception): pass
+class UnknownLogException(Exception):
+    """Thrown when a log type is not known. (so unexpected!)"""
 
 class Log:
     """Represents one log entry
-    
+
     Examples:
     log = `Log("log line here")` # NOTE: must be a valid log entry"""
     def __init__(self, line: Optional[str] = None) -> None:
-        if not line or line[0] != "[": raise UnknownLogException("Does not start with [")
+        if not line or line[0] != "[":
+            raise UnknownLogException("Does not start with [")
 
         self.time = None
         self.agent = None
@@ -109,26 +123,30 @@ class Log:
         self.is_dead = None
 
         self.raw_line = line
-        dt, other = self.raw_line.split("] ", 1)
-        self.time = isoparse(dt[1:]) # Remove starting [
-        if other.endswith("VOTE:"): other += " "
-        if ": " not in other and (" in " in other or " (as " in other): # This means it's probably a TGUI log
+        date_time, other = self.raw_line.split("] ", 1)
+        self.time = isoparse(date_time[1:]) # Remove starting [
+        if other.endswith("VOTE:"):
+            other += " "
+
+        # Check for TGUI logs
+        if ": " not in other and (" in " in other or " (as " in other):
             # TGUI logs work the following way:
             # If it's a mob, add "[mob.ckey] (as [mob] at [mob.x],[mob.y],[mob.z])"
             # If it's a client, just add "[client.ckey]"
             # Now it checks for context and window. If any of those are true, it
             # appends " in [window]" (or context instead of window).
             # You see, here's the problem. What if we only have a client and no window or context?
-            # Is that even possible? I am too lazy to make sure and will assume it's not. If it is, hi! Welcome to hell.
-            # Please edit the conditional before to work. Just know that it will catch false positives.
-            # What fun world of logging we live in. 
+            # Is that even possible? I am too lazy to make sure and will assume it's not.
+            # If it is, hi! Welcome to hell. Please edit the conditional before to work.
+            # Just know that it will catch false positives. What fun world of logging we live in.
             self.parse_tgui(other)
             return
         log_type, other = other.split(": ", 1)
         self.log_type = LogType.parse_log_type(log_type)
         # Python go brrrrrrr
-        f = getattr(self, f"parse_{self.log_type.name.lower()}", None)
-        if f: f(other)
+        parsing_function = getattr(self, f"parse_{self.log_type.name.lower()}", None)
+        if parsing_function:
+            parsing_function(other)
 
     time: Annotated[datetime, "Time of logging"]
     agent: Annotated[Optional[Player], "Player performing the action"]
@@ -167,7 +185,8 @@ class Log:
         self.text = log
 
     def parse_adminprivate(self, log: str) -> None:
-        """Parses a game log entry from `ADMINPRIVATE:` onwards (ADMINPRIVATE: should not be included)"""
+        """Parses a game log entry from `ADMINPRIVATE:` onwards
+        (ADMINPRIVATE: should not be included)"""
         # TODO: add better parsing for tickets
         self.text = log
 
@@ -196,7 +215,8 @@ class Log:
         self.location_name = location[:loc_start]
 
     def parse_radioemote(self, log: str) -> None:
-        """Parses a game log entry from `RADIOEMOTE:` onwards (RADIOEMOTE: should not be included)"""
+        """Parses a game log entry from `RADIOEMOTE:` onwards
+        (RADIOEMOTE: should not be included)"""
         self.parse_emote(log)
 
     def parse_attack(self, log: str) -> None:
@@ -217,23 +237,24 @@ class Log:
             self.location_name = other[:loc_start].split("(")[-1].strip()
             other = other[:loc_start].replace(self.location_name, "").strip(" (")
         # Combat mode regex
-        r = re.search("\(COMBAT MODE: (\d)\)", other)
-        if r: 
-            self.combat_mode = bool(int(r.group(1)))
-            other = other.replace(r.group(0), "")
+        match = re.search(r"\(COMBAT MODE: (\d)\)", other)
+        if match:
+            self.combat_mode = bool(int(match.group(1)))
+            other = other.replace(match.group(0), "")
         # Damage type regex
-        r = re.search("\(DAMTYPE: (\w+)\)", other)
-        if r: 
-            self.damage_type = DamageType.parse_damage_type(r.group(1))
-            other = other.replace(r.group(0), "")
+        match = re.search(r"\(DAMTYPE: (\w+)\)", other)
+        if match:
+            self.damage_type = DamageType.parse_damage_type(match.group(1))
+            other = other.replace(match.group(0), "")
         # New HP regex
-        r = re.search("\(NEWHP: (-?\d+\.?\d?)\)", other)
-        if r: 
-            self.new_hp = float(r.group(1))
-            other = other.replace(r.group(0), "")
-        
-        # NOTE: There is no better way of doing this. Why? Because the ckey isn't a ckey, it's a key WHICH COULD
-        # CONTAIN SPACES AND IT'S IMPOSSIBLE TO TELL WHAT IS PART OF THE KEY AND WHAT ISN'T. I love SS13 logs.
+        match = re.search(r"\(NEWHP: (-?\d+\.?\d?)\)", other)
+        if match:
+            self.new_hp = float(match.group(1))
+            other = other.replace(match.group(0), "")
+
+        # NOTE: There is no better way of doing this. Why? Because the ckey isn't a ckey,
+        # it's a key WHICH COULD CONTAIN SPACES AND IT'S IMPOSSIBLE TO TELL WHAT IS PART
+        # OF THE KEY AND WHAT ISN'T. I love SS13 logs.
         parse_key = False
         other_temp = None
         # One word
@@ -264,7 +285,8 @@ class Log:
             "has implanted", "has stung", "has augmented", "has bopped", "has stuffed",
             "has places", # Do NOT fix this typo, I will have to add another damn startswith
             # "has hit", # I don't think this is ever used against players, so I'll leave it out
-            "has kicks" # Another typo... feel free to fix for free GBP since we already have "kicked"
+            # Another typo... feel free to fix for free GBP since we already have "kicked"
+            "has kicks"
         )):
             other_temp = other.split(" ", 2)[2].replace("(CQC) ", "")
             parse_key = True
@@ -304,7 +326,8 @@ class Log:
             other_temp = other.split(" ", 4)[4]
             parse_key = True
         # Five words
-        elif other.startswith(("has tended to the wounds", "has attempted to neck grab", "has overloaded the heart of")):
+        elif other.startswith(("has tended to the wounds", "has attempted to neck grab",
+                                "has overloaded the heart of")):
             other_temp = other.split(" ", 5)[5]
             parse_key = True
 
@@ -313,8 +336,9 @@ class Log:
             if "/(" in patient:
                 self.patient = Player.parse_player(patient)
             del other_temp
-        # NOTE: surgery related logs were not added, as they are quite rare and I don't think they'd contribute much. Feel free
-        # to add them yourself. (example: "has surgically removed")
+        # NOTE: surgery related logs were not added, as they are quite rare and I don't
+        # think they'd contribute much. Feel free to add them yourself.
+        # Example: "has surgically removed"
         # On another note, `attached a the saline-glucose solution bottle to the`
         self.text = other.strip()
 
@@ -349,17 +373,18 @@ class Log:
         # Sending a message with the message monitor console adds a "sent " FOR NO PARTICULAR REASON
         # It gets better... it also moves " to "...
         if "PDA: message monitor console" in other:
-            pda_type, other = other.split(') sent "')
+            _pda_type, other = other.split(') sent "')
             text, other = other.split('" to ', 1)
             loc_start = self.parse_and_set_location(other)
             self.location_name = other[:loc_start].split("(")[-1].strip()
             # -1 for a space that we stripped, and an extra 1 for the bracket
             patient = other[:loc_start - len(self.location_name) - 2].strip()
         else:
-            pda_type, other = other.strip(" (").split(" to ", 1)
+            _pda_type, other = other.strip(" (").split(" to ", 1)
             patient, other = other.split(') "', 1)
-            # If this happens, it's probably a multiline PDA message... and if not? Another exception to add to the list...
-            if '"' not in other: 
+            # If this happens, it's probably a multiline PDA message...
+            # And if not? Another exception to add to the list...
+            if '"' not in other:
                 text = other
             else:
                 text, location = other.split('" (', 1)
@@ -385,10 +410,11 @@ class Log:
         if log.startswith("A culture bottle was printed for the virus"):
             agent = log.split(") by ", 1)[1]
             self.agent = Player.parse_player(agent)
-            self.virus_name, other = log.split("A culture bottle was printed for the virus ")[1].split(" sym:", 1)
+            self.virus_name, other = log.split("A culture bottle was printed for the virus ")[1]\
+                                                            .split(" sym:", 1)
             self.text = "printed, sym:" + other.strip()
         else:
-            agent, other = log.split(" was infected by virus: ") 
+            agent, other = log.split(" was infected by virus: ")
             self.agent = Player.parse_player(agent)
             virus_name, other = other.split(" sym:")
             self.virus_name = virus_name
@@ -405,16 +431,16 @@ class Log:
 
         self.is_dead = False
         agent, other = log.split(" [", 1)
-        if ("/(") in agent:
+        if "/(" in agent:
             self.agent = Player.parse_player(agent)
         else:
             self.agent = Player(None, agent)
         channel, other = other.split("] (", 1)
         self.telecomms_network = channel
-        spans, other = other.split(') "', 1)
+        _spans, other = other.split(') "', 1)
         text, other = other.split('" (', 1)
         self.text = html_unescape(text.strip())
-        language, location = other.split(") (", 1)
+        _language, location = other.split(") (", 1)
         loc_start = self.parse_and_set_location(location)
         self.location_name = location[:loc_start].strip()
 
@@ -448,7 +474,7 @@ class Log:
             key, other = other.split(" (as ", 1)
             mob, other = other.split(" at ", 1)
             location, other = other.split(")", 1)
-            
+
             #Can't use parse_and_set_location because it's a snowflake log yet again! Fun.
             self.location = tuple(int(x) for x in location.split(","))
 
@@ -465,31 +491,35 @@ class Log:
 
         # Set text to 'Empty' if other is empty, since we're expecting
         # extra data (newlines will get appended)
-        self.text = other or "Empty" 
+        self.text = other or "Empty"
 
     def parse_and_set_location(self, log: str) -> int:
         """Finds and parses a location entry. (location name (x, y, z)). Can parse a raw line.
-        
+
         Returns the position of the location in the string as in integer"""
         # NOTE: this does not set location name, as it is not always present
         # Find all possible location strings
-        r = re.findall("\(\d{1,3},\d{1,3},\d{1,2}\)", log)
+        match = re.findall(r"\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
-        if not len(r): return -1 
+        if not match:
+            return -1
         # Get location of last match
-        loc = log.index(r[-1]) 
-        # Take the last result from the regex, remove the first and last character and turn into a list
-        r = r[-1][1:-1].split(",")
+        loc = log.index(match[-1])
+        # Take the last result from the regex, remove the first and last character,
+        # and turn into a list
+        match = match[-1][1:-1].split(",")
         # Turn all elements to ints, convert to tuple
-        self.location = tuple([int(x) for x in r]) # Bad practice since it's a side effect
+        self.location = tuple(int(x) for x in match) # Bad practice since it's a side effect
         return loc
 
     def generic_say_parse(self, log: str) -> None:
-        """Parses a generic SAY log entry from SAY: onwards (includes SAY, WHISPER, OOC) (should only include line from SAY: onwards, without the SAY)"""
+        """Parses a generic SAY log entry from SAY: onwards (includes SAY, WHISPER, OOC)
+        (should only include line from SAY: onwards, without the SAY)"""
         agent, other = log.split(") ", 1) # Ensure that we didn't get a name with spaces
         self.agent = Player.parse_player(agent)
         # Priority announcements, yet another exception
-        if other.startswith(("(priority announcement)", "(message to the other server)")) and '" ' not in other:
+        if other.startswith(("(priority announcement)", "(message to the other server)")) and \
+                            '" ' not in other:
             self.text = html_unescape(other.strip())
             return
         text, other = other.split('" ', 1)
@@ -498,7 +528,7 @@ class Log:
         other = other.strip()
         if other:
             self.text += " | " + other
-        
+
         self.is_dead = False
         if "(DEAD)" in text:
             text = text.replace("(DEAD) ", "", 1)
@@ -514,6 +544,6 @@ class Log:
         return self.raw_line
 
 if __name__ == "__main__":
-    log = Log(input())
-    print(log)
-    print(log.__dict__)
+    single_log = Log(input())
+    print(single_log)
+    print(single_log.__dict__)
