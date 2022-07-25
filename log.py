@@ -215,7 +215,8 @@ class Log:
         self.location_name = location[:loc_start]
 
     def parse_radioemote(self, log: str) -> None:
-        """Parses a game log entry from `RADIOEMOTE:` onwards (RADIOEMOTE: should not be included)"""
+        """Parses a game log entry from `RADIOEMOTE:` onwards
+        (RADIOEMOTE: should not be included)"""
         self.parse_emote(log)
 
     def parse_attack(self, log: str) -> None:
@@ -284,7 +285,8 @@ class Log:
             "has implanted", "has stung", "has augmented", "has bopped", "has stuffed",
             "has places", # Do NOT fix this typo, I will have to add another damn startswith
             # "has hit", # I don't think this is ever used against players, so I'll leave it out
-            "has kicks" # Another typo... feel free to fix for free GBP since we already have "kicked"
+            # Another typo... feel free to fix for free GBP since we already have "kicked"
+            "has kicks"
         )):
             other_temp = other.split(" ", 2)[2].replace("(CQC) ", "")
             parse_key = True
@@ -499,14 +501,15 @@ class Log:
         # Find all possible location strings
         match = re.findall(r"\(\d{1,3},\d{1,3},\d{1,2}\)", log)
         # Check if there are any results
-        if not len(match):
+        if not match:
             return -1
         # Get location of last match
         loc = log.index(match[-1])
-        # Take the last result from the regex, remove the first and last character and turn into a list
+        # Take the last result from the regex, remove the first and last character,
+        # and turn into a list
         match = match[-1][1:-1].split(",")
         # Turn all elements to ints, convert to tuple
-        self.location = tuple([int(x) for x in match]) # Bad practice since it's a side effect
+        self.location = tuple(int(x) for x in match) # Bad practice since it's a side effect
         return loc
 
     def generic_say_parse(self, log: str) -> None:
