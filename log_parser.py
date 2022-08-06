@@ -75,6 +75,7 @@ class LogFile:
         self.who = []
         self.sortable = True
         self.log_type = log_type
+        self.log_source = None
 
         if not logs:
             return
