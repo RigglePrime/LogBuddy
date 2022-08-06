@@ -458,7 +458,7 @@ class LogFile:
         Returns LogFile"""
         if filename.endswith(".html"): raise UnsupportedLogTypeException(f"{filename} does not seem to be supported")
         if not log_type and "." in filename:
-            log_type = LogFileType.parse_log_file_type(filename.split(".", 1))
+            log_type = LogFileType.parse_log_file_type(filename.split(".", 1)[0])
         with open(filename, "r", encoding = "utf-8") as f:
             lines = f.readlines()
         return LogFile(lines, log_type, verbose, quiet)
