@@ -66,7 +66,8 @@ class LogFile:
 
     `log_file = LogFile()` # Empty log file, useful for combining more later using `collate`,
     `log_file = LogFile(open("game.log").readlines(), LogFileType.UNKNOWN)`,
-    `log_file = LogFile(["logline 1", "log line 2", "log line 3"]) # NOTE: must be a valid log or the parser will raise an exception`
+    `log_file = LogFile(["logline 1", "log line 2", "log line 3"]) \
+        # NOTE: must be a valid log or the parser will raise an exception`
     """
     round_id: Annotated[int, "Stores the round ID. If unknown, it will equal -1"]
     unfiltered_logs: Annotated[list[Log], "Stores a list of all logs"]
@@ -75,7 +76,12 @@ class LogFile:
     sortable: bool
     log_source: Annotated[str, "Source of the logs (if available)"]
 
-    def __init__(self, logs: list[str] = None, log_type: LogFileType = LogFileType.UNKNOWN, verbose: bool = False, quiet: bool = False) -> None:
+
+    def __init__(self,
+                 logs: list[str] = None,
+                 log_type: LogFileType = LogFileType.UNKNOWN,
+                 verbose: bool = False,
+                 quiet: bool = False) -> None:
         if verbose and quiet:
             print("Really? You want me to be silent and verbose? Those are mutually exclusive you know")
         self.round_id = -1
@@ -88,7 +94,8 @@ class LogFile:
         if not logs:
             return
         if "Starting up round ID" in logs[0]:
-            self.round_id = int(logs[0].split("Starting up round ID ")[1].strip(". \r\n"))  # Also remove \r\n just in case, had some errors with that before
+            # Also remove \r\n just in case, had some errors with that before
+            self.round_id = int(logs[0].split("Starting up round ID ")[1].strip(". \r\n"))
             logs = logs[2:]
 
         for line in logs:
@@ -180,7 +187,8 @@ class LogFile:
         Parameters:
         `logfile` (LogFile): the LogFile object you want to combine
 
-        Example: `my_logs = LogFile()` `my_logs.collate(LogFile.from_file("game.txt"))` `my_logs.collate(LogFile.from_file("attack.txt"))`
+        Example: `my_logs = LogFile()` `my_logs.collate(LogFile.from_file("game.txt"))` \
+            `my_logs.collate(LogFile.from_file\("attack.txt"))` # noqa: W605
 
         Returns `None`
         """
@@ -192,8 +200,9 @@ class LogFile:
         self.logs = self.unfiltered_logs
 
     def filter_ckeys(self, *ckeys: str) -> None:
-        """Removes all logs in which the specified ckeys are not present, saving the result in self.work_set. Works much like Notepad++,
-        but only counts the agent (actor, the one who performed the action). See `filter_strings` for a function like Notepad++ bookmark
+        """Removes all logs in which the specified ckeys are not present, saving the result in self.work_set.
+        Works much like Notepad++, but only counts the agent (actor, the one who performed the action).
+        See `filter_strings` for a function like Notepad++ bookmark
 
         Parameters:
         `ckeys` (tuple[str, ...]): ckeys to filter
@@ -211,13 +220,17 @@ class LogFile:
         self.logs = filtered
 
     def filter_strings(self, *strings: str, case_sensitive: bool = False) -> None:
-        """Removes all logs in which the specified strings are not present, saving them in `self.work_set`. Works exactly like Notepad++ bookmark
+        """Removes all logs in which the specified strings are not present, saving them in `self.work_set`.
+        Works exactly like Notepad++ bookmark
 
         Parameters:
         `strings` (tuple[str, ...]): strings to filter
         `case_sensitive` (bool): toggles case sensitivity
 
-        Example calls: `my_logs.filter_strings("Hi!")`, `my_logs.filter_strings("attacked", "injected", "I hate you")`, `my_logs.filter_strings("racial slur", case_sensitive=True)` (as many strings as you want)
+        Example calls:
+            `my_logs.filter_strings("Hi!")`
+            `my_logs.filter_strings("attacked", "injected", "I hate you")`
+            `my_logs.filter_strings("racial slur", case_sensitive=True)` (as many strings as you want)
 
         Returns `None`"""
         filtered = []
@@ -241,7 +254,8 @@ class LogFile:
         self.filter_strings(*strings, case_sensitive=True)
 
     def filter_heard(self, ckey: str, walking_error: int = 4) -> None:
-        """Removes all log entries which could not have been heard by the specified ckey (very much in alpha) and stores the remaining lines in `self.work_set`
+        """Removes all log entries which could not have been heard by the specified ckey (very much in alpha)
+        and stores the remaining lines in `self.work_set`
 
         Parameters:
         `ckey` (str): desired ckey
@@ -253,7 +267,8 @@ class LogFile:
         self.logs = self.get_only_heard(ckey, walking_error=walking_error)
 
     def filter_conversation(self, *ckeys: str, walking_error: int = 4) -> None:  # TODO: hide lines not in conversation
-        """Tries to get a conversation between multiple parties, excluding what they would and would not hear. Only accounts for local say (for now). Saves the result in `self.work_set`
+        """Tries to get a conversation between multiple parties, excluding what they would and would not hear. \
+            Only accounts for local say (for now). Saves the result in `self.work_set`
 
         Parameters:
         `ckeys` (tuple[str, ...]): ckeys to use for sorting
@@ -280,15 +295,22 @@ class LogFile:
         Example call: my_logs.reset_work_set()"""
         self.logs = self.unfiltered_logs
 
-    def get_only_heard(self, ckey: str, logs_we_care_about: Union[list[LogType], Literal["ALL"]] = "ALL", walking_error: int = 4) -> list[Log]:
-        """Removes all log entries which could not have been heard by the specified ckey (very much in alpha). Uses logs from `self.work_set`
+    def get_only_heard(self,
+                       ckey: str,
+                       logs_we_care_about: Union[list[LogType], Literal["ALL"]] = "ALL",
+                       walking_error: int = 4) -> list[Log]:
+        """Removes all log entries which could not have been heard by the specified ckey (very much in alpha).
+        Uses logs from `self.work_set`
 
         Parameters:
         `ckey` (str): ckeys to use
         `logs_we_care_about` (list[LogType])
         `walking_error` (int): added to hearing range to account for the lack of logs
 
-        Example calls: `my_logs.get_only_heard("ckey")`, `my_logs.get_only_heard("ckey", "ALL")`, `my_logs.get_only_heard("ckey", [LogType.SAY, LogType.WHISPER])`
+        Example calls:
+            `my_logs.get_only_heard("ckey")`
+            `my_logs.get_only_heard("ckey", "ALL")`
+            `my_logs.get_only_heard("ckey", [LogType.SAY, LogType.WHISPER])`
 
         Returns `list[Log]`"""
         self.sort()
@@ -299,7 +321,9 @@ class LogFile:
         last_loc = cur_loc
         for log in self.logs:
             # Check for ckey. If our target was included in the action we can safely assume they saw it
-            if (log.agent and ckey == log.agent.ckey) or (log.patient and ckey == log.patient.ckey) or (log.text and f"{ckey}/(" in log.text):
+            if (log.agent and ckey == log.agent.ckey) \
+                    or (log.patient and ckey == log.patient.ckey) \
+                    or (log.text and f"{ckey}/(" in log.text):
                 # If there's a location attached, update it
                 if log.location:
                     last_loc = cur_loc
@@ -451,7 +475,8 @@ class LogFile:
             for log in self.logs:
                 f.write(str(log) + "\n")
             from version import VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH
-            f.write(f"Created using LogBuddy v{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH} https://github.com/RigglePrime/LogBuddy\n")
+            f.write(f"Created using LogBuddy v{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH} \
+                https://github.com/RigglePrime/LogBuddy\n")
             if self.log_source:
                 f.write(f"Logs acquired from {self.log_source}")
 
@@ -461,7 +486,8 @@ class LogFile:
 
         Parameters:
         `filename` (str): name (and location) of the desired file
-        `type` (LogFileType): type of the log. Use if you want to override log type detection (optional, defaults to LogFileType.UNKNOWN)
+        `type` (LogFileType): type of the log. Use if you want to override log type detection
+            (optional, defaults to LogFileType.UNKNOWN)
         `verbose` (bool): toggle verbose mode (False by default)
         `quiet` (bool): toggle quiet mode (False by default)
 
