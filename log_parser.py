@@ -192,8 +192,9 @@ class LogFile:
 
         Returns `None`"""
         filtered = []
+        ckeys = [x.lower() for x in ckeys]
         for log in self.logs:
-            if log.agent and log.agent.ckey in ckeys:
+            if log.agent and log.agent.ckey.lower() in ckeys:
                 filtered.append(log)
         if not filtered:
             print("Operation completed with empty set. Aborting.")
