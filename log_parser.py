@@ -332,7 +332,7 @@ class LogFile:
         Returns `None`"""
         filtered = []
         for log in self.logs:
-            if location_name.lower() == log.location_name.lower():
+            if log.location_name and location_name.lower() == log.location_name.lower():
                 filtered.append(log)
         if not filtered:
             print("Operation completed with empty set. Aborting.")
