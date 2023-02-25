@@ -1,5 +1,7 @@
 # LogBuddy
 
+This project has been retired in favour or [SS13Tools](https://github.com/RigglePrime/SS13-tools/)! Everything available here and more has been moved over there.
+
 - [LogBuddy](#logbuddy)
   - [Currently supported log files](#currently-supported-log-files)
   - [How it works](#how-it-works)
